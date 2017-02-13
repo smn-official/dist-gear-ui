@@ -1,0 +1,19 @@
+{
+  "name": "gear-ui",
+  "version": "1.0.0",
+  "description": "Pacote de componentes de interface desenvolvidos com AngularJS e Material Design",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smn-official/dist-gear-ui.git"
+  },
+  "authors": [
+    "Mario Santos <mariocsants@gmail.com>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smn-official/dist-gear-ui/issues"
+  },
+  "homepage": "https://github.com/smn-official/dist-gear-ui#readme"
+}
