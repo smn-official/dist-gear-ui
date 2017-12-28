@@ -615,6 +615,7 @@
             });
 
             ctrl.$formatters.push(function (value) {
+                value = typeof value == 'number' ? value.toString() : value;
                 if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
                 return uiCpfFilter(value);
             });
@@ -700,6 +701,7 @@
             });
 
             ctrl.$formatters.push(function (value) {
+                value = typeof value == 'number' ? value.toString() : value;
                 if (value) value = ("00000000000000" + value).substring(14 + value.length - 14);
                 return uiCnpjFilter(value);
             });
@@ -1450,6 +1452,67 @@
 (function () {
     'use strict';
 
+    angular.module('smn-ui').filter('uiInteger', uiInteger);
+
+    function uiInteger() {
+        return uiIntegerFilter;
+
+        ////////////////
+
+        function uiIntegerFilter(value) {
+            if (value === undefined || value === null) return null;
+            value = value.toString().replace(/\D+/g, '');
+            value = value ? parseInt(value) : null;
+            return value;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiInteger', uiInteger);
+
+    uiInteger.$inject = ['uiIntegerFilter'];
+
+    function uiInteger(uiIntegerFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel',
+            scope: {
+                uiIntegerDigitMax: '=?'
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = formatValue(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                return viewValue;
+            });
+            ctrl.$formatters.push(formatValue);
+            function formatValue(value) {
+                var newValue = uiIntegerFilter(value);
+                if (scope.uiIntegerDigitMax && typeof newValue === 'number') {
+                    var maxDigit = parseInt(scope.uiIntegerDigitMax);
+                    if (!isNaN(maxDigit)) {
+                        newValue = parseInt(newValue.toString().substring(0, maxDigit));
+                    }
+                }
+                return newValue;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
 
     function uiMaxLength() {
@@ -1639,67 +1702,6 @@
 (function () {
     'use strict';
 
-    angular.module('smn-ui').filter('uiInteger', uiInteger);
-
-    function uiInteger() {
-        return uiIntegerFilter;
-
-        ////////////////
-
-        function uiIntegerFilter(value) {
-            if (value === undefined || value === null) return null;
-            value = value.toString().replace(/\D+/g, '');
-            value = value ? parseInt(value) : null;
-            return value;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiInteger', uiInteger);
-
-    uiInteger.$inject = ['uiIntegerFilter'];
-
-    function uiInteger(uiIntegerFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel',
-            scope: {
-                uiIntegerDigitMax: '=?'
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = formatValue(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                return viewValue;
-            });
-            ctrl.$formatters.push(formatValue);
-            function formatValue(value) {
-                var newValue = uiIntegerFilter(value);
-                if (scope.uiIntegerDigitMax && typeof newValue === 'number') {
-                    var maxDigit = parseInt(scope.uiIntegerDigitMax);
-                    if (!isNaN(maxDigit)) {
-                        newValue = parseInt(newValue.toString().substring(0, maxDigit));
-                    }
-                }
-                return newValue;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     angular.module('smn-ui').filter('uiHour', uiHour);
 
     function uiHour() {
@@ -1826,25 +1828,6 @@
 (function () {
   'use strict';
 
-  angular.module('smn-ui').component('uiSwitch', {
-    controller: uiSwitchController
-  });
-
-  uiSwitchController.$inject = ['$element'];
-
-  function uiSwitchController($element) {
-    var $ctrl = this;
-    $ctrl.$postLink = function () {
-      $element.wrapInner('<label></label>');
-      $element.find('input').addClass('ui-switch').after('<div class="switch-cover"><div class="track"></div><div class="thumb-container"><div class="thumb"></div></div></div>');
-    };
-  }
-})();
-'use strict';
-
-(function () {
-  'use strict';
-
   angular.module('smn-ui').component('uiOption', {
     controller: uiOptionController
   });
@@ -1856,6 +1839,25 @@
     $ctrl.$postLink = function () {
       $element.wrapInner('<label></label>');
       $element.find('input').addClass('ui-option').after('<div class="ui-option-shell"><div class="ui-option-fill"></div><div class="ui-option-mark"></div></div>');
+    };
+  }
+})();
+'use strict';
+
+(function () {
+  'use strict';
+
+  angular.module('smn-ui').component('uiSwitch', {
+    controller: uiSwitchController
+  });
+
+  uiSwitchController.$inject = ['$element'];
+
+  function uiSwitchController($element) {
+    var $ctrl = this;
+    $ctrl.$postLink = function () {
+      $element.wrapInner('<label></label>');
+      $element.find('input').addClass('ui-switch').after('<div class="switch-cover"><div class="track"></div><div class="thumb-container"><div class="thumb"></div></div></div>');
     };
   }
 })();
@@ -1878,6 +1880,125 @@
 
         $ctrl.$postLink = function () {
             $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
+        };
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiAutocompleteController.$inject = ["$element", "$timeout"];
+    angular.module('smn-ui').component('uiAutocomplete', {
+        controller: uiAutocompleteController,
+        require: {
+            ngModelCtrl: 'ngModel'
+        },
+        template:'<ui-input-container><input type="text" ng-model="$ctrl.searchQuery" ng-focus="$ctrl.blur($ctrl.searchQuery); $ctrl.uiFocus()" ng-blur="$ctrl.hideItems(); $ctrl.uiBlur()" ng-change="$ctrl.searchItem($ctrl.searchQuery); $ctrl.uiChange()" ng-keydown="$ctrl.inputKeyAction($event)" ng-disabled="$ctrl.uiDisabled" ng-attr-placeholder="{{$ctrl.placeholder}}"> <label class="keep-float" ng-bind="$ctrl.uiLabel"></label></ui-input-container><ui-card class="ui-autocomplete-suggestions" ng-if="$ctrl.uiItems && $ctrl.itemsShown" tabindex="-1" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()"><ul class="ui-list s-l1 s-dense"><li class="clickable" ng-repeat="item in $ctrl.uiItemsFiltered = $ctrl.uiItems track by (ctrl.uiTrackBy || $index)"><div class="item-cover blue" ng-click="$ctrl.selectItem(item)" ng-class="{\'focused\': $ctrl.focusedIndex === $index}"><div class="list-text"><span ng-bind="$ctrl.uiPrimaryInfo ? item[$ctrl.uiPrimaryInfo] : item"></span><div class="ui-secondary" ng-if="$ctrl.uiSecondaryInfo" ng-bind="$ctrl.uiSecondaryInfo ? item[$ctrl.uiSecondaryInfo] : item"></div></div></div></li><li ng-if="!$ctrl.uiItems.length"><div class="item-cover"><div class="list-text ui-ellipsis">Nenhum resultado encontrado para "{{$ctrl.searchQuery}}"</div></div></li></ul></ui-card>',
+        bindings: {
+            'ngModel': '=',
+            'uiItems': '=',
+            'required': '=',
+            'uiDisabled': '=',
+            'uiItemsValue': '@',
+            'uiPrimaryInfo': '@',
+            'uiSecondaryInfo': '@',
+            'uiLabel': '@',
+            'uiTrackBy': '@',
+            'searchQuery': '=uiSearchQuery',
+            'searchFunction': '=uiSearchFunction',
+            'selectFunction': '=uiSelectFunction',
+            'uiFocus': '&',
+            'uiBlur': '&',
+            'uiChange': '&',
+            'placeholder': '@',
+            'name': '@'
+        }
+    });
+
+    function uiAutocompleteController($element, $timeout) {
+        var $ctrl = this;
+        $ctrl.ngModel = $ctrl.ngModel || [];
+        $ctrl.uiItemsFiltered = [];
+        $ctrl.focusedIndex = 0;
+        $ctrl.$onInit = function () {
+
+            $element.attr('tabindex', -1);
+            $element.bind('click', function (e) {
+                if (angular.element(e.target).is('ui-autocomplete')) $element.find('input').focus();
+            });
+            $element.on('focus', '> *', function (e) {
+                $element.addClass('ui-focused');
+            });
+            $element.on('blur', '> *', function (e) {
+                $element.removeClass('ui-focused');
+            });
+        };
+
+        $ctrl.inputKeyAction = function (event) {
+            switch (event.which) {
+                case 8:
+                case 37:
+                    if ($ctrl.ngModel && !$ctrl.searchQuery) $element.children('input').prev().focus();
+                    break;
+                case 38:
+                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.focusedIndex ? $ctrl.focusedIndex - 1 : $ctrl.uiItemsFiltered.length - 1;
+                    break;
+                case 40:
+                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.uiItemsFiltered.length - 1 === $ctrl.focusedIndex ? 0 : $ctrl.focusedIndex + 1;
+                    break;
+                case 13:
+                    if ($ctrl.searchQuery && !$ctrl.uiItems) {
+                        $ctrl.searchQuery = '';
+                    } else if ($ctrl.uiItemsFiltered) {
+                        if (typeof $ctrl.focusedIndex === 'number') $ctrl.selectItem($ctrl.uiItemsFiltered[$ctrl.focusedIndex]);
+                    }
+                    event.preventDefault();
+                    break;
+            }
+        };
+
+        var hideTimeout;
+        var searchTimeout;
+        $ctrl.itemsShown = false;
+        $ctrl.showItems = function () {
+            $timeout.cancel(hideTimeout);
+            $ctrl.itemsShown = true;
+            $timeout(function () {
+                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            });
+        };
+        $ctrl.hideItems = function () {
+            hideTimeout = $timeout(function () {
+                $ctrl.itemsShown = false;
+                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            });
+        };
+        $ctrl.blur = function (query) {
+            $ctrl.searchFunction(query);
+            $ctrl.showItems();
+        };
+
+        $ctrl.searchItem = function (query) {
+            $ctrl.searchQuery = query;
+            $timeout.cancel(searchTimeout);
+            searchTimeout = $timeout(function () {
+                $ctrl.searchFunction(query);
+                $ctrl.showItems();
+            }, 300);
+        };
+
+        $ctrl.selectItem = function (item) {
+            $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            $ctrl.ngModel = $ctrl.uiItemsValue ? item[$ctrl.uiItemsValue] : item;
+            $ctrl.ngModelCtrl.$modelValue = $ctrl.ngModel;
+            $ctrl.ngModelCtrl.$setDirty();
+            $element.find('input').focus();
+            $ctrl.selectFunction && $ctrl.selectFunction(item);
+            $timeout(function () {
+                $ctrl.searchQuery = $ctrl.ngModel[$ctrl.uiPrimaryInfo];
+                $ctrl.hideItems();
+            });
         };
     }
 })();
@@ -2056,125 +2177,6 @@
                 }
             });
         }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiAutocompleteController.$inject = ["$element", "$timeout"];
-    angular.module('smn-ui').component('uiAutocomplete', {
-        controller: uiAutocompleteController,
-        require: {
-            ngModelCtrl: 'ngModel'
-        },
-        template:'<ui-input-container><input type="text" ng-model="$ctrl.searchQuery" ng-focus="$ctrl.blur($ctrl.searchQuery); $ctrl.uiFocus()" ng-blur="$ctrl.hideItems(); $ctrl.uiBlur()" ng-change="$ctrl.searchItem($ctrl.searchQuery); $ctrl.uiChange()" ng-keydown="$ctrl.inputKeyAction($event)" ng-disabled="$ctrl.uiDisabled" ng-attr-placeholder="{{$ctrl.placeholder}}"> <label class="keep-float" ng-bind="$ctrl.uiLabel"></label></ui-input-container><ui-card class="ui-autocomplete-suggestions" ng-if="$ctrl.uiItems && $ctrl.itemsShown" tabindex="-1" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()"><ul class="ui-list s-l1 s-dense"><li class="clickable" ng-repeat="item in $ctrl.uiItemsFiltered = $ctrl.uiItems track by (ctrl.uiTrackBy || $index)"><div class="item-cover blue" ng-click="$ctrl.selectItem(item)" ng-class="{\'focused\': $ctrl.focusedIndex === $index}"><div class="list-text"><span ng-bind="$ctrl.uiPrimaryInfo ? item[$ctrl.uiPrimaryInfo] : item"></span><div class="ui-secondary" ng-if="$ctrl.uiSecondaryInfo" ng-bind="$ctrl.uiSecondaryInfo ? item[$ctrl.uiSecondaryInfo] : item"></div></div></div></li><li ng-if="!$ctrl.uiItems.length"><div class="item-cover"><div class="list-text ui-ellipsis">Nenhum resultado encontrado para "{{$ctrl.searchQuery}}"</div></div></li></ul></ui-card>',
-        bindings: {
-            'ngModel': '=',
-            'uiItems': '=',
-            'required': '=',
-            'uiDisabled': '=',
-            'uiItemsValue': '@',
-            'uiPrimaryInfo': '@',
-            'uiSecondaryInfo': '@',
-            'uiLabel': '@',
-            'uiTrackBy': '@',
-            'searchQuery': '=uiSearchQuery',
-            'searchFunction': '=uiSearchFunction',
-            'selectFunction': '=uiSelectFunction',
-            'uiFocus': '&',
-            'uiBlur': '&',
-            'uiChange': '&',
-            'placeholder': '@',
-            'name': '@'
-        }
-    });
-
-    function uiAutocompleteController($element, $timeout) {
-        var $ctrl = this;
-        $ctrl.ngModel = $ctrl.ngModel || [];
-        $ctrl.uiItemsFiltered = [];
-        $ctrl.focusedIndex = 0;
-        $ctrl.$onInit = function () {
-
-            $element.attr('tabindex', -1);
-            $element.bind('click', function (e) {
-                if (angular.element(e.target).is('ui-autocomplete')) $element.find('input').focus();
-            });
-            $element.on('focus', '> *', function (e) {
-                $element.addClass('ui-focused');
-            });
-            $element.on('blur', '> *', function (e) {
-                $element.removeClass('ui-focused');
-            });
-        };
-
-        $ctrl.inputKeyAction = function (event) {
-            switch (event.which) {
-                case 8:
-                case 37:
-                    if ($ctrl.ngModel && !$ctrl.searchQuery) $element.children('input').prev().focus();
-                    break;
-                case 38:
-                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.focusedIndex ? $ctrl.focusedIndex - 1 : $ctrl.uiItemsFiltered.length - 1;
-                    break;
-                case 40:
-                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.uiItemsFiltered.length - 1 === $ctrl.focusedIndex ? 0 : $ctrl.focusedIndex + 1;
-                    break;
-                case 13:
-                    if ($ctrl.searchQuery && !$ctrl.uiItems) {
-                        $ctrl.searchQuery = '';
-                    } else if ($ctrl.uiItemsFiltered) {
-                        if (typeof $ctrl.focusedIndex === 'number') $ctrl.selectItem($ctrl.uiItemsFiltered[$ctrl.focusedIndex]);
-                    }
-                    event.preventDefault();
-                    break;
-            }
-        };
-
-        var hideTimeout;
-        var searchTimeout;
-        $ctrl.itemsShown = false;
-        $ctrl.showItems = function () {
-            $timeout.cancel(hideTimeout);
-            $ctrl.itemsShown = true;
-            $timeout(function () {
-                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            });
-        };
-        $ctrl.hideItems = function () {
-            hideTimeout = $timeout(function () {
-                $ctrl.itemsShown = false;
-                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            });
-        };
-        $ctrl.blur = function (query) {
-            $ctrl.searchFunction(query);
-            $ctrl.showItems();
-        };
-
-        $ctrl.searchItem = function (query) {
-            $ctrl.searchQuery = query;
-            $timeout.cancel(searchTimeout);
-            searchTimeout = $timeout(function () {
-                $ctrl.searchFunction(query);
-                $ctrl.showItems();
-            }, 300);
-        };
-
-        $ctrl.selectItem = function (item) {
-            $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            $ctrl.ngModel = $ctrl.uiItemsValue ? item[$ctrl.uiItemsValue] : item;
-            $ctrl.ngModelCtrl.$modelValue = $ctrl.ngModel;
-            $ctrl.ngModelCtrl.$setDirty();
-            $element.find('input').focus();
-            $ctrl.selectFunction && $ctrl.selectFunction(item);
-            $timeout(function () {
-                $ctrl.searchQuery = $ctrl.ngModel[$ctrl.uiPrimaryInfo];
-                $ctrl.hideItems();
-            });
-        };
     }
 })();
 'use strict';
@@ -2858,51 +2860,6 @@
 'use strict';
 
 (function () {
-	'use strict';
-
-	angular.module('smn-ui').directive('uiProfileFloat', uiProfileFloat);
-
-	uiProfileFloat.$inject = ['$templateCache', '$interval'];
-
-	function uiProfileFloat($templateCache, $interval) {
-		var directive = {
-			restrict: 'E',
-			scope: {
-				src: '='
-			},
-			transclude: true,
-			template:'<div ng-if="!src" ng-transclude></div><img ng-src="{{src}}" ng-if="src" ng-style="{\'max-width\': !higherWidth ? \'100%\' : \'\', \'max-height\': higherWidth ? \'100%\' : \'\'}">',
-			link: link
-		};
-		return directive;
-
-		function link(scope, element) {
-			var loaded = false,
-			    img = element.find('img'),
-			    wait;
-			scope.$watch('src', function (value) {
-				if (!value) return;
-				wait = $interval(function () {
-					if (loaded) $interval.cancel(wait);
-					scope.higherWidth = !img[0] || img[0].naturalWidth > img[0].naturalHeight;
-				}, 0);
-			});
-			img.on('load', function (e) {
-				scope.$apply(function () {
-					loaded = true;
-				});
-			});
-			img.on('error', function (e) {
-				scope.$apply(function () {
-					loaded = true;
-				});
-			});
-		}
-	}
-})();
-'use strict';
-
-(function () {
     'use strict';
 
     angular.module('smn-ui').directive('uiMultiHandle', uiMultiHandle);
@@ -3055,6 +3012,51 @@
             }
         }
     }
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
+	angular.module('smn-ui').directive('uiProfileFloat', uiProfileFloat);
+
+	uiProfileFloat.$inject = ['$templateCache', '$interval'];
+
+	function uiProfileFloat($templateCache, $interval) {
+		var directive = {
+			restrict: 'E',
+			scope: {
+				src: '='
+			},
+			transclude: true,
+			template:'<div ng-if="!src" ng-transclude></div><img ng-src="{{src}}" ng-if="src" ng-style="{\'max-width\': !higherWidth ? \'100%\' : \'\', \'max-height\': higherWidth ? \'100%\' : \'\'}">',
+			link: link
+		};
+		return directive;
+
+		function link(scope, element) {
+			var loaded = false,
+			    img = element.find('img'),
+			    wait;
+			scope.$watch('src', function (value) {
+				if (!value) return;
+				wait = $interval(function () {
+					if (loaded) $interval.cancel(wait);
+					scope.higherWidth = !img[0] || img[0].naturalWidth > img[0].naturalHeight;
+				}, 0);
+			});
+			img.on('load', function (e) {
+				scope.$apply(function () {
+					loaded = true;
+				});
+			});
+			img.on('error', function (e) {
+				scope.$apply(function () {
+					loaded = true;
+				});
+			});
+		}
+	}
 })();
 'use strict';
 

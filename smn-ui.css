@@ -4554,6 +4554,67 @@ ui-floating-card ui-card-wrap {
     min-height: 60px;
   }
 }
+ui-profile-float {
+  width: 80px;
+  height: 80px;
+  border-radius: 100%;
+  background-color: #2196F3;
+  color: white;
+  background-position: center;
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  font-size: 40px;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  font-weight: 100;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 6px 18px rgba(0,0,0,0.2);
+}
+
+ui-profile-float img {
+  position: absolute;
+  top: -9999px;
+  bottom: -9999px;
+  left: -9999px;
+  right: -9999px;
+  margin: auto;
+}
+
+ui-profile-float.ng-enter {
+  margin: -40px auto -40px;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  opacity: 0;
+  transition: 200ms ease-in-out;
+}
+
+ui-profile-float.ng-enter-active {
+  margin: -40px auto 0;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  opacity: 1;
+}
+
+ui-profile-float.ng-leave {
+  margin: -40px auto 0;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  opacity: 1;
+  transition: 200ms ease-in-out;
+}
+
+ui-profile-float.ng-leave-active {
+  margin: -40px auto -40px;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  opacity: 0;
+}
 ui-multi-handle {
   display: -webkit-box;
   display: flex;
@@ -4704,67 +4765,6 @@ ui-multi-handle .value.ng-enter {
 
 ui-multi-handle .value.ng-leave {
   transition: none;
-}
-ui-profile-float {
-  width: 80px;
-  height: 80px;
-  border-radius: 100%;
-  background-color: #2196F3;
-  color: white;
-  background-position: center;
-  background-size: auto 100%;
-  background-repeat: no-repeat;
-  overflow: hidden;
-  -webkit-transform: scale(1);
-  transform: scale(1);
-  font-size: 40px;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-  font-weight: 100;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 6px 18px rgba(0,0,0,0.2);
-}
-
-ui-profile-float img {
-  position: absolute;
-  top: -9999px;
-  bottom: -9999px;
-  left: -9999px;
-  right: -9999px;
-  margin: auto;
-}
-
-ui-profile-float.ng-enter {
-  margin: -40px auto -40px;
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  opacity: 0;
-  transition: 200ms ease-in-out;
-}
-
-ui-profile-float.ng-enter-active {
-  margin: -40px auto 0;
-  -webkit-transform: scale(1);
-  transform: scale(1);
-  opacity: 1;
-}
-
-ui-profile-float.ng-leave {
-  margin: -40px auto 0;
-  -webkit-transform: scale(1);
-  transform: scale(1);
-  opacity: 1;
-  transition: 200ms ease-in-out;
-}
-
-ui-profile-float.ng-leave-active {
-  margin: -40px auto -40px;
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  opacity: 0;
 }
 .ui-search-card .search-area {
   display: -webkit-box;
@@ -5675,36 +5675,6 @@ ui-tree-view .action-wrap button.ng-leave {
 ui-tree-view .action-wrap button.ng-leave-active {
   opacity: 0;
 }
-ui-autocomplete {
-  cursor: text;
-  position: relative;
-  display: block;
-}
-
-ui-autocomplete .ui-autocomplete-suggestions {
-  max-height: 20vh;
-  overflow: auto;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1;
-}
-
-ui-autocomplete .ui-autocomplete-suggestions.ng-enter {
-  opacity: 0;
-  transition: none;
-  max-height: 0;
-}
-
-ui-autocomplete .ui-autocomplete-suggestions.ng-leave {
-  transition: 300ms ease-in-out;
-}
-
-ui-autocomplete .ui-autocomplete-suggestions.ng-leave {
-  opacity: 0;
-  max-height: 0;
-}
 .ui-button-cover {
   display: -webkit-box;
   display: flex;
@@ -6240,6 +6210,36 @@ ui-chips .ui-chip-autocomplete.ng-leave {
   opacity: 0;
   max-height: 0;
 }
+ui-autocomplete {
+  cursor: text;
+  position: relative;
+  display: block;
+}
+
+ui-autocomplete .ui-autocomplete-suggestions {
+  max-height: 20vh;
+  overflow: auto;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+ui-autocomplete .ui-autocomplete-suggestions.ng-enter {
+  opacity: 0;
+  transition: none;
+  max-height: 0;
+}
+
+ui-autocomplete .ui-autocomplete-suggestions.ng-leave {
+  transition: 300ms ease-in-out;
+}
+
+ui-autocomplete .ui-autocomplete-suggestions.ng-leave {
+  opacity: 0;
+  max-height: 0;
+}
 ui-input-wrap {
   display: -webkit-box;
   display: flex;
@@ -6595,6 +6595,139 @@ ui-input-container.ui-percent >.ui-control~label {
 ui-input-container.ui-percent input {
   padding-right: 14px;
 }
+ui-switch {
+  position: relative;
+  width: 36px;
+  height: 24px;
+  display: inline-block;
+}
+
+ui-switch input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+ui-switch .switch-cover {
+  background-color: #2196f3;
+  width: 0;
+  height: 0;
+  margin: auto;
+}
+
+ui-switch .track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 34px;
+  height: 14px;
+  background-color: inherit;
+  opacity: 0.5;
+  border-radius: 7px;
+  transition: 300ms ease-in-out;
+}
+
+ui-switch .thumb-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  margin: auto 0;
+  width: 20px;
+  background-color: inherit;
+  transition: right 300ms ease-in-out;
+}
+
+ui-switch .thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.2);
+  background-color: inherit;
+  transition: 300ms ease-in-out;
+}
+
+ui-switch .ng-empty + .switch-cover {
+  background-color: #212121;
+}
+
+ui-switch .ng-empty + .switch-cover .thumb-container {
+  right: 100%;
+}
+
+ui-switch .ng-empty + .switch-cover .thumb {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.21), 0 1px 3px rgba(0,0,0,0.3);
+  -webkit-transform: translateX(100%);
+  transform: translateX(100%);
+}
+
+ui-switch .ng-empty:not([disabled]) + .switch-cover .thumb {
+  background-color: white;
+}
+
+ui-switch .thumb-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  margin: auto -20px;
+  border-radius: 50%;
+  background-color: inherit;
+  opacity: 0.2;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  transition: 300ms ease-in-out;
+  pointer-events: none;
+}
+
+ui-switch input.ng-empty + .switch-cover .thumb-container::before {
+  background-color: black;
+  opacity: 0.1;
+  margin: auto 0;
+}
+
+ui-switch input:focus + .switch-cover .thumb-container::before,
+ui-switch input:active + .switch-cover .thumb-container::before {
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+
+ui-switch [disabled] + .switch-cover {
+  background-color: #bdbdbd;
+}
+.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid,
+.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid,
+.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid {
+  border-color: #F44336;
+}
+
+.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ label,
+.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ label,
+.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ label,
+.ui-error-message {
+  color: #F44336;
+}
+
+.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ .line,
+.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ .line,
+.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ .line {
+  background-color: #F44336;
+}
 ui-option-container {
   display: -webkit-box;
   display: flex;
@@ -6847,139 +6980,6 @@ ui-option-container.b-space-8 > ui-option {
 
 ui-option-container.b-space-16 > ui-option {
   margin-right: 16px;
-}
-ui-switch {
-  position: relative;
-  width: 36px;
-  height: 24px;
-  display: inline-block;
-}
-
-ui-switch input {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-}
-
-ui-switch .switch-cover {
-  background-color: #2196f3;
-  width: 0;
-  height: 0;
-  margin: auto;
-}
-
-ui-switch .track {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 34px;
-  height: 14px;
-  background-color: inherit;
-  opacity: 0.5;
-  border-radius: 7px;
-  transition: 300ms ease-in-out;
-}
-
-ui-switch .thumb-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  height: 0;
-  margin: auto 0;
-  width: 20px;
-  background-color: inherit;
-  transition: right 300ms ease-in-out;
-}
-
-ui-switch .thumb {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  margin: auto 0;
-  width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.2);
-  background-color: inherit;
-  transition: 300ms ease-in-out;
-}
-
-ui-switch .ng-empty + .switch-cover {
-  background-color: #212121;
-}
-
-ui-switch .ng-empty + .switch-cover .thumb-container {
-  right: 100%;
-}
-
-ui-switch .ng-empty + .switch-cover .thumb {
-  box-shadow: 0 1px 2px rgba(0,0,0,0.21), 0 1px 3px rgba(0,0,0,0.3);
-  -webkit-transform: translateX(100%);
-  transform: translateX(100%);
-}
-
-ui-switch .ng-empty:not([disabled]) + .switch-cover .thumb {
-  background-color: white;
-}
-
-ui-switch .thumb-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  right: 0;
-  bottom: 0;
-  width: 40px;
-  height: 40px;
-  margin: auto -20px;
-  border-radius: 50%;
-  background-color: inherit;
-  opacity: 0.2;
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  transition: 300ms ease-in-out;
-  pointer-events: none;
-}
-
-ui-switch input.ng-empty + .switch-cover .thumb-container::before {
-  background-color: black;
-  opacity: 0.1;
-  margin: auto 0;
-}
-
-ui-switch input:focus + .switch-cover .thumb-container::before,
-ui-switch input:active + .switch-cover .thumb-container::before {
-  -webkit-transform: scale(1);
-  transform: scale(1);
-}
-
-ui-switch [disabled] + .switch-cover {
-  background-color: #bdbdbd;
-}
-.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid,
-.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid,
-.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid {
-  border-color: #F44336;
-}
-
-.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ label,
-.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ label,
-.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ label,
-.ui-error-message {
-  color: #F44336;
-}
-
-.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ .line,
-.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ .line,
-.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ .line {
-  background-color: #F44336;
 }
 .ui-hamburger-icon {
   position: relative;
