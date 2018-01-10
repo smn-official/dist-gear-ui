@@ -204,113 +204,6 @@
 (function () {
     'use strict';
 
-    uiMaskPhonenumber.$inject = ["uiPhonenumberFilter", "$timeout"];
-    angular.module('smn-ui').directive('uiMaskPhonenumber', uiMaskPhonenumber);
-
-    function uiMaskPhonenumber(uiPhonenumberFilter, $timeout) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            var beforeSelIndex, afterSelIndex, futureSelIndex;
-
-            element.on('keydown', function () {
-                beforeSelIndex = doGetCaretPosition(element[0]);
-            });
-
-            ctrl.$parsers.push(function (value) {
-                afterSelIndex = doGetCaretPosition(element[0]);
-
-                var viewValue = uiPhonenumberFilter(value);
-                ctrl.$setViewValue(uiPhonenumberFilter(viewValue));
-                ctrl.$render();
-
-                if (element[0].selectionStart || element[0].selectionStart == '0') {
-                    switch (true) {
-                        case beforeSelIndex == 4 && afterSelIndex == 5:
-                            futureSelIndex = 6;
-                            break;
-                        default:
-                            futureSelIndex = afterSelIndex;
-                    }
-                    setCaretPosition(element[0], futureSelIndex);
-                    $timeout(function () {
-                        setCaretPosition(element[0], futureSelIndex);
-                    });
-                }
-
-                if (viewValue.length === 9 || viewValue.length === 10) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                return uiPhonenumberFilter(value);
-            });
-
-            function doGetCaretPosition(elem) {
-                var caretPos = 0;
-                // IE Support
-                if (document.selection) {
-                    elem.focus();
-                    var sel = document.selection.createRange();
-                    sel.moveStart('character', -elem.value.length);
-                    caretPos = sel.text.length;
-                }
-                // Firefox support
-                else if (elem.selectionStart || elem.selectionStart == '0') {
-                        caretPos = elem.selectionStart;
-                    }
-
-                return caretPos;
-            }
-
-            function setCaretPosition(elem, caretPos) {
-                if (elem != null) {
-                    if (elem.createTextRange) {
-                        var range = elem.createTextRange();
-                        range.move('character', caretPos);
-                        range.select();
-                    } else {
-                        if (elem.selectionStart) {
-                            elem.focus();
-                            elem.setSelectionRange(caretPos, caretPos);
-                        } else {
-                            elem.focus();
-                        }
-                    }
-                }
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiPhonenumber', uiPhonenumber);
-
-    function uiPhonenumber() {
-        return uiPhonenumberFilter;
-
-        function uiPhonenumberFilter(phonenumber) {
-            if (!phonenumber) return '';
-            phonenumber = phonenumber.toString().replace(/[^0-9]+/g, '');
-            if (phonenumber.length > 4 && phonenumber.length < 9) phonenumber = phonenumber.substring(0, 4) + '-' + phonenumber.substring(4);else if (phonenumber.length > 8) phonenumber = phonenumber.substring(0, 5) + '-' + phonenumber.substring(5);
-            if (phonenumber.length > 10) phonenumber = phonenumber.substring(0, 10);
-            return phonenumber;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     uiMaskPhone.$inject = ["uiPhoneFilter"];
     angular.module('smn-ui').directive('uiMaskPhone', uiMaskPhone);
 
@@ -594,64 +487,10 @@
 (function () {
     'use strict';
 
-    uiMaskCpf.$inject = ["uiCpfFilter"];
-    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
+    uiMaskPhonenumber.$inject = ["uiPhonenumberFilter", "$timeout"];
+    angular.module('smn-ui').directive('uiMaskPhonenumber', uiMaskPhonenumber);
 
-    function uiMaskCpf(uiCpfFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = uiCpfFilter(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                value = typeof value == 'number' ? value.toString() : value;
-                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
-                return uiCpfFilter(value);
-            });
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCpf', uiCpf);
-
-    function uiCpf() {
-        return uiCpfFilter;
-
-        function uiCpfFilter(cpf) {
-            if (!cpf) return '';
-            cpf = cpf.toString().replace(/[^0-9]+/g, '');
-            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
-            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
-            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
-            if (cpf.length > 14) cpf = cpf.substring(0, 14);
-            return cpf;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMaskCnpj.$inject = ["uiCnpjFilter", "$timeout"];
-    angular.module('smn-ui').directive('uiMaskCnpj', uiMaskCnpj);
-
-    function uiMaskCnpj(uiCnpjFilter, $timeout) {
+    function uiMaskPhonenumber(uiPhonenumberFilter, $timeout) {
         var directive = {
             restrict: 'A',
             link: link,
@@ -669,23 +508,14 @@
             ctrl.$parsers.push(function (value) {
                 afterSelIndex = doGetCaretPosition(element[0]);
 
-                var viewValue = uiCnpjFilter(value);
-                ctrl.$setViewValue(viewValue);
+                var viewValue = uiPhonenumberFilter(value);
+                ctrl.$setViewValue(uiPhonenumberFilter(viewValue));
                 ctrl.$render();
 
                 if (element[0].selectionStart || element[0].selectionStart == '0') {
                     switch (true) {
-                        case beforeSelIndex == 2 && afterSelIndex == 3:
-                            futureSelIndex = 4;
-                            break;
-                        case beforeSelIndex == 6 && afterSelIndex == 7:
-                            futureSelIndex = 8;
-                            break;
-                        case beforeSelIndex == 10 && afterSelIndex == 11:
-                            futureSelIndex = 12;
-                            break;
-                        case beforeSelIndex == 15 && afterSelIndex == 16:
-                            futureSelIndex = 17;
+                        case beforeSelIndex == 4 && afterSelIndex == 5:
+                            futureSelIndex = 6;
                             break;
                         default:
                             futureSelIndex = afterSelIndex;
@@ -696,14 +526,12 @@
                     });
                 }
 
-                if (viewValue.length === 18) return viewValue.replace(/[^0-9]+/g, '');
+                if (viewValue.length === 9 || viewValue.length === 10) return viewValue.replace(/[^0-9]+/g, '');
                 if (!viewValue) return '';
             });
 
             ctrl.$formatters.push(function (value) {
-                value = typeof value == 'number' ? value.toString() : value;
-                if (value) value = ("00000000000000" + value).substring(14 + value.length - 14);
-                return uiCnpjFilter(value);
+                return uiPhonenumberFilter(value);
             });
 
             function doGetCaretPosition(elem) {
@@ -747,22 +575,107 @@
 (function () {
     'use strict';
 
-    angular.module('smn-ui').filter('uiCnpj', uiCnpj);
+    angular.module('smn-ui').filter('uiPhonenumber', uiPhonenumber);
 
-    function uiCnpj() {
-        return uiCnpjFilter;
+    function uiPhonenumber() {
+        return uiPhonenumberFilter;
 
-        ////////////////
+        function uiPhonenumberFilter(phonenumber) {
+            if (!phonenumber) return '';
+            phonenumber = phonenumber.toString().replace(/[^0-9]+/g, '');
+            if (phonenumber.length > 4 && phonenumber.length < 9) phonenumber = phonenumber.substring(0, 4) + '-' + phonenumber.substring(4);else if (phonenumber.length > 8) phonenumber = phonenumber.substring(0, 5) + '-' + phonenumber.substring(5);
+            if (phonenumber.length > 10) phonenumber = phonenumber.substring(0, 10);
+            return phonenumber;
+        }
+    }
+})();
+'use strict';
 
-        function uiCnpjFilter(cnpj) {
-            if (!cnpj) return '';
-            cnpj = cnpj.toString().replace(/[^0-9]+/g, '');
-            if (cnpj.length > 2) cnpj = cnpj.substring(0, 2) + '.' + cnpj.substring(2);
-            if (cnpj.length > 6) cnpj = cnpj.substring(0, 6) + '.' + cnpj.substring(6);
-            if (cnpj.length > 10) cnpj = cnpj.substring(0, 10) + '/' + cnpj.substring(10);
-            if (cnpj.length > 15) cnpj = cnpj.substring(0, 15) + '-' + cnpj.substring(15);
-            if (cnpj.length > 18) cnpj = cnpj.substring(0, 18);
-            return cnpj;
+(function () {
+    'use strict';
+
+    uiMaskCpf.$inject = ["uiCpfFilter"];
+    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
+
+    function uiMaskCpf(uiCpfFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = uiCpfFilter(value);
+                ctrl.$setValidity('cpf', isValidCpf(viewValue));
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                value = typeof value == 'number' ? value.toString() : value;
+                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
+                return uiCpfFilter(value);
+            });
+
+            function isValidCpf(cpf) {
+                if (!cpf) return true;
+
+                if (cpf.length >= 14) {
+                    var valid = true;
+
+                    cpf = cpf.replace(/[^\d]+/g, '');
+
+                    if (cpf.length != 11) valid = false;
+
+                    var sum;
+                    var rest;
+                    sum = 0;
+                    if (cpf == "00000000000" || cpf == "11111111111" || cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" || cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" || cpf == "88888888888" || cpf == "99999999999") valid = false;
+
+                    for (var i = 1; i <= 9; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(9, 10))) valid = false;
+
+                    sum = 0;
+                    for (var i = 1; i <= 10; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(10, 11))) valid = false;
+
+                    if (!valid) return false;
+                }
+                return true;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCpf', uiCpf);
+
+    function uiCpf() {
+        return uiCpfFilter;
+
+        function uiCpfFilter(cpf) {
+            if (!cpf) return '';
+            cpf = cpf.toString().replace(/[^0-9]+/g, '');
+            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
+            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
+            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
+            if (cpf.length > 14) cpf = cpf.substring(0, 14);
+            return cpf;
         }
     }
 })();
@@ -871,6 +784,203 @@
             if (cep.length > 9) cep = cep.substring(0, 9);
             return cep;
         }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiMaskCnpj.$inject = ["uiCnpjFilter", "$timeout"];
+    angular.module('smn-ui').directive('uiMaskCnpj', uiMaskCnpj);
+
+    function uiMaskCnpj(uiCnpjFilter, $timeout) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            var beforeSelIndex, afterSelIndex, futureSelIndex;
+
+            element.on('keydown', function () {
+                beforeSelIndex = doGetCaretPosition(element[0]);
+            });
+
+            ctrl.$parsers.push(function (value) {
+                afterSelIndex = doGetCaretPosition(element[0]);
+
+                var viewValue = uiCnpjFilter(value);
+                ctrl.$setValidity('cnpj', isValidCnpj(viewValue));
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+
+                if (element[0].selectionStart || element[0].selectionStart == '0') {
+                    switch (true) {
+                        case beforeSelIndex == 2 && afterSelIndex == 3:
+                            futureSelIndex = 4;
+                            break;
+                        case beforeSelIndex == 6 && afterSelIndex == 7:
+                            futureSelIndex = 8;
+                            break;
+                        case beforeSelIndex == 10 && afterSelIndex == 11:
+                            futureSelIndex = 12;
+                            break;
+                        case beforeSelIndex == 15 && afterSelIndex == 16:
+                            futureSelIndex = 17;
+                            break;
+                        default:
+                            futureSelIndex = afterSelIndex;
+                    }
+                    setCaretPosition(element[0], futureSelIndex);
+                    $timeout(function () {
+                        setCaretPosition(element[0], futureSelIndex);
+                    });
+                }
+
+                if (viewValue.length === 18) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                value = typeof value == 'number' ? value.toString() : value;
+                if (value) value = ("00000000000000" + value).substring(14 + value.length - 14);
+                return uiCnpjFilter(value);
+            });
+
+            function doGetCaretPosition(elem) {
+                var caretPos = 0;
+                // IE Support
+                if (document.selection) {
+                    elem.focus();
+                    var sel = document.selection.createRange();
+                    sel.moveStart('character', -elem.value.length);
+                    caretPos = sel.text.length;
+                }
+                // Firefox support
+                else if (elem.selectionStart || elem.selectionStart == '0') {
+                        caretPos = elem.selectionStart;
+                    }
+
+                return caretPos;
+            }
+
+            function setCaretPosition(elem, caretPos) {
+                if (elem != null) {
+                    if (elem.createTextRange) {
+                        var range = elem.createTextRange();
+                        range.move('character', caretPos);
+                        range.select();
+                    } else {
+                        if (elem.selectionStart) {
+                            elem.focus();
+                            elem.setSelectionRange(caretPos, caretPos);
+                        } else {
+                            elem.focus();
+                        }
+                    }
+                }
+            }
+
+            function isValidCnpj(cnpj) {
+                if (!cnpj) return true;
+
+                if (cnpj.length >= 18) {
+                    var valid = true;
+                    cnpj = cnpj.replace(/[^\d]+/g, '');
+
+                    if (cnpj.length != 14) valid = false;
+
+                    if (cnpj == "00000000000000" || cnpj == "11111111111111" || cnpj == "22222222222222" || cnpj == "33333333333333" || cnpj == "44444444444444" || cnpj == "55555555555555" || cnpj == "66666666666666" || cnpj == "77777777777777" || cnpj == "88888888888888" || cnpj == "99999999999999") valid = false;
+
+                    var size = cnpj.length - 2;
+                    var numbers = cnpj.substring(0, size);
+                    var digits = cnpj.substring(size);
+                    var sum = 0;
+                    var pos = size - 7;
+                    for (var i = size; i >= 1; i--) {
+                        sum += numbers.charAt(size - i) * pos--;
+                        if (pos < 2) pos = 9;
+                    }
+                    var result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+                    if (result != digits.charAt(0)) valid = false;
+
+                    size = size + 1;
+                    numbers = cnpj.substring(0, size);
+                    sum = 0;
+                    pos = size - 7;
+                    for (var i = size; i >= 1; i--) {
+                        sum += numbers.charAt(size - i) * pos--;
+                        if (pos < 2) pos = 9;
+                    }
+                    result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+                    if (result != digits.charAt(1)) valid = false;
+
+                    if (!valid) return false;
+                }
+                return true;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCnpj', uiCnpj);
+
+    function uiCnpj() {
+        return uiCnpjFilter;
+
+        ////////////////
+
+        function uiCnpjFilter(cnpj) {
+            if (!cnpj) return '';
+            cnpj = cnpj.toString().replace(/[^0-9]+/g, '');
+            if (cnpj.length > 2) cnpj = cnpj.substring(0, 2) + '.' + cnpj.substring(2);
+            if (cnpj.length > 6) cnpj = cnpj.substring(0, 6) + '.' + cnpj.substring(6);
+            if (cnpj.length > 10) cnpj = cnpj.substring(0, 10) + '/' + cnpj.substring(10);
+            if (cnpj.length > 15) cnpj = cnpj.substring(0, 15) + '-' + cnpj.substring(15);
+            if (cnpj.length > 18) cnpj = cnpj.substring(0, 18);
+            return cnpj;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiFilterBy', uiFilterBy);
+
+    uiFilterBy.$inject = ['uiUnaccentFilter'];
+
+    function uiFilterBy(uiUnaccentFilter) {
+        return function (items, query, props, isCaseInsensitive) {
+            isCaseInsensitive = typeof isCaseInsensitive === 'undefined' ? true : isCaseInsensitive;
+            query = typeof query === 'string' ? query.toLowerCase() : query;
+            query = isCaseInsensitive && query ? uiUnaccentFilter(query) : query;
+            if (!items) return [];
+            return items.filter(function (item) {
+                if (!query) return true;
+                for (var i = 0; i < props.length; i++) {
+                    var value = '',
+                        itemProps = props[i];
+                    if (itemProps.props) {
+                        for (var j = 0; j < itemProps.props.length; j++) {
+                            var subProp = itemProps.props[j];
+                            value += item[subProp] + (j < itemProps.props.length - 1 && itemProps.join ? itemProps.join : '');
+                        }
+                    } else value = item[props[i]];
+                    value = isCaseInsensitive ? uiUnaccentFilter(value) : value;
+                    if (value.toLowerCase().indexOf(query) != -1) return true;
+                }
+                return false;
+            });
+        };
     }
 })();
 'use strict';
@@ -1176,40 +1286,6 @@
 (function () {
     'use strict';
 
-    angular.module('smn-ui').filter('uiFilterBy', uiFilterBy);
-
-    uiFilterBy.$inject = ['uiUnaccentFilter'];
-
-    function uiFilterBy(uiUnaccentFilter) {
-        return function (items, query, props, isCaseInsensitive) {
-            isCaseInsensitive = typeof isCaseInsensitive === 'undefined' ? true : isCaseInsensitive;
-            query = typeof query === 'string' ? query.toLowerCase() : query;
-            query = isCaseInsensitive && query ? uiUnaccentFilter(query) : query;
-            if (!items) return [];
-            return items.filter(function (item) {
-                if (!query) return true;
-                for (var i = 0; i < props.length; i++) {
-                    var value = '',
-                        itemProps = props[i];
-                    if (itemProps.props) {
-                        for (var j = 0; j < itemProps.props.length; j++) {
-                            var subProp = itemProps.props[j];
-                            value += item[subProp] + (j < itemProps.props.length - 1 && itemProps.join ? itemProps.join : '');
-                        }
-                    } else value = item[props[i]];
-                    value = isCaseInsensitive ? uiUnaccentFilter(value) : value;
-                    if (value.toLowerCase().indexOf(query) != -1) return true;
-                }
-                return false;
-            });
-        };
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     angular.module('smn-ui').directive('uiTrigger', uiTrigger);
 
     function uiTrigger() {
@@ -1452,6 +1528,47 @@
 (function () {
     'use strict';
 
+    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
+
+    function uiMaxLength() {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: ['ngModel', '?^form'],
+            scope: {
+                uiMaxlength: '='
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            scope.$watch('uiMaxlength', function (value, oldValue) {
+                element.attr('maxlength', value);
+            });
+            // ctrl[0].$formatters.unshift(formatValue);
+            // ctrl[0].$parsers.unshift(formatValue);
+            function formatValue(value) {
+                if (!value || !scope.uiMaxLength) return value;
+                var newValue = value.toString();
+                var maxLength = parseInt(scope.uiMaxLength);
+                if (isNaN(maxLength)) return;
+                newValue = newValue.substring(0, maxLength);
+                var isModelPristine = ctrl[0].$pristine,
+                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
+                ctrl[0].$setViewValue(newValue);
+                ctrl[0].$render();
+                isModelPristine && ctrl[0].$setPristine();
+                isFormPristine && ctrl[1].$setPristine();
+                return newValue;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     angular.module('smn-ui').filter('uiInteger', uiInteger);
 
     function uiInteger() {
@@ -1503,47 +1620,6 @@
                         newValue = parseInt(newValue.toString().substring(0, maxDigit));
                     }
                 }
-                return newValue;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
-
-    function uiMaxLength() {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: ['ngModel', '?^form'],
-            scope: {
-                uiMaxlength: '='
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            scope.$watch('uiMaxlength', function (value, oldValue) {
-                element.attr('maxlength', value);
-            });
-            // ctrl[0].$formatters.unshift(formatValue);
-            // ctrl[0].$parsers.unshift(formatValue);
-            function formatValue(value) {
-                if (!value || !scope.uiMaxLength) return value;
-                var newValue = value.toString();
-                var maxLength = parseInt(scope.uiMaxLength);
-                if (isNaN(maxLength)) return;
-                newValue = newValue.substring(0, maxLength);
-                var isModelPristine = ctrl[0].$pristine,
-                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
-                ctrl[0].$setViewValue(newValue);
-                ctrl[0].$render();
-                isModelPristine && ctrl[0].$setPristine();
-                isFormPristine && ctrl[1].$setPristine();
                 return newValue;
             }
         }
@@ -1826,362 +1902,6 @@
 'use strict';
 
 (function () {
-  'use strict';
-
-  angular.module('smn-ui').component('uiOption', {
-    controller: uiOptionController
-  });
-
-  uiOptionController.$inject = ['$element'];
-
-  function uiOptionController($element) {
-    var $ctrl = this;
-    $ctrl.$postLink = function () {
-      $element.wrapInner('<label></label>');
-      $element.find('input').addClass('ui-option').after('<div class="ui-option-shell"><div class="ui-option-fill"></div><div class="ui-option-mark"></div></div>');
-    };
-  }
-})();
-'use strict';
-
-(function () {
-  'use strict';
-
-  angular.module('smn-ui').component('uiSwitch', {
-    controller: uiSwitchController
-  });
-
-  uiSwitchController.$inject = ['$element'];
-
-  function uiSwitchController($element) {
-    var $ctrl = this;
-    $ctrl.$postLink = function () {
-      $element.wrapInner('<label></label>');
-      $element.find('input').addClass('ui-switch').after('<div class="switch-cover"><div class="track"></div><div class="thumb-container"><div class="thumb"></div></div></div>');
-    };
-  }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').component('uiInputContainer', {
-        controller: uiInputContainerController,
-        require: '?ngModel',
-        bindings: {
-            'ngModel': '=?'
-        }
-    });
-
-    uiInputContainerController.$inject = ['$element'];
-    function uiInputContainerController($element) {
-        var $ctrl = this;
-
-        $ctrl.$postLink = function () {
-            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
-        };
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiAutocompleteController.$inject = ["$element", "$timeout"];
-    angular.module('smn-ui').component('uiAutocomplete', {
-        controller: uiAutocompleteController,
-        require: {
-            ngModelCtrl: 'ngModel'
-        },
-        template:'<ui-input-container><input type="text" ng-model="$ctrl.searchQuery" ng-focus="$ctrl.blur($ctrl.searchQuery); $ctrl.uiFocus()" ng-blur="$ctrl.hideItems(); $ctrl.uiBlur()" ng-change="$ctrl.searchItem($ctrl.searchQuery); $ctrl.uiChange()" ng-keydown="$ctrl.inputKeyAction($event)" ng-disabled="$ctrl.uiDisabled" ng-attr-placeholder="{{$ctrl.placeholder}}"> <label class="keep-float" ng-bind="$ctrl.uiLabel"></label></ui-input-container><ui-card class="ui-autocomplete-suggestions" ng-if="$ctrl.uiItems && $ctrl.itemsShown" tabindex="-1" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()"><ul class="ui-list s-l1 s-dense"><li class="clickable" ng-repeat="item in $ctrl.uiItemsFiltered = $ctrl.uiItems track by (ctrl.uiTrackBy || $index)"><div class="item-cover blue" ng-click="$ctrl.selectItem(item)" ng-class="{\'focused\': $ctrl.focusedIndex === $index}"><div class="list-text"><span ng-bind="$ctrl.uiPrimaryInfo ? item[$ctrl.uiPrimaryInfo] : item"></span><div class="ui-secondary" ng-if="$ctrl.uiSecondaryInfo" ng-bind="$ctrl.uiSecondaryInfo ? item[$ctrl.uiSecondaryInfo] : item"></div></div></div></li><li ng-if="!$ctrl.uiItems.length"><div class="item-cover"><div class="list-text ui-ellipsis">Nenhum resultado encontrado para "{{$ctrl.searchQuery}}"</div></div></li></ul></ui-card>',
-        bindings: {
-            'ngModel': '=',
-            'uiItems': '=',
-            'required': '=',
-            'uiDisabled': '=',
-            'uiItemsValue': '@',
-            'uiPrimaryInfo': '@',
-            'uiSecondaryInfo': '@',
-            'uiLabel': '@',
-            'uiTrackBy': '@',
-            'searchQuery': '=uiSearchQuery',
-            'searchFunction': '=uiSearchFunction',
-            'selectFunction': '=uiSelectFunction',
-            'uiFocus': '&',
-            'uiBlur': '&',
-            'uiChange': '&',
-            'placeholder': '@',
-            'name': '@'
-        }
-    });
-
-    function uiAutocompleteController($element, $timeout) {
-        var $ctrl = this;
-        $ctrl.ngModel = $ctrl.ngModel || [];
-        $ctrl.uiItemsFiltered = [];
-        $ctrl.focusedIndex = 0;
-        $ctrl.$onInit = function () {
-
-            $element.attr('tabindex', -1);
-            $element.bind('click', function (e) {
-                if (angular.element(e.target).is('ui-autocomplete')) $element.find('input').focus();
-            });
-            $element.on('focus', '> *', function (e) {
-                $element.addClass('ui-focused');
-            });
-            $element.on('blur', '> *', function (e) {
-                $element.removeClass('ui-focused');
-            });
-        };
-
-        $ctrl.inputKeyAction = function (event) {
-            switch (event.which) {
-                case 8:
-                case 37:
-                    if ($ctrl.ngModel && !$ctrl.searchQuery) $element.children('input').prev().focus();
-                    break;
-                case 38:
-                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.focusedIndex ? $ctrl.focusedIndex - 1 : $ctrl.uiItemsFiltered.length - 1;
-                    break;
-                case 40:
-                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.uiItemsFiltered.length - 1 === $ctrl.focusedIndex ? 0 : $ctrl.focusedIndex + 1;
-                    break;
-                case 13:
-                    if ($ctrl.searchQuery && !$ctrl.uiItems) {
-                        $ctrl.searchQuery = '';
-                    } else if ($ctrl.uiItemsFiltered) {
-                        if (typeof $ctrl.focusedIndex === 'number') $ctrl.selectItem($ctrl.uiItemsFiltered[$ctrl.focusedIndex]);
-                    }
-                    event.preventDefault();
-                    break;
-            }
-        };
-
-        var hideTimeout;
-        var searchTimeout;
-        $ctrl.itemsShown = false;
-        $ctrl.showItems = function () {
-            $timeout.cancel(hideTimeout);
-            $ctrl.itemsShown = true;
-            $timeout(function () {
-                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            });
-        };
-        $ctrl.hideItems = function () {
-            hideTimeout = $timeout(function () {
-                $ctrl.itemsShown = false;
-                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            });
-        };
-        $ctrl.blur = function (query) {
-            $ctrl.searchFunction(query);
-            $ctrl.showItems();
-        };
-
-        $ctrl.searchItem = function (query) {
-            $ctrl.searchQuery = query;
-            $timeout.cancel(searchTimeout);
-            searchTimeout = $timeout(function () {
-                $ctrl.searchFunction(query);
-                $ctrl.showItems();
-            }, 300);
-        };
-
-        $ctrl.selectItem = function (item) {
-            $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            $ctrl.ngModel = $ctrl.uiItemsValue ? item[$ctrl.uiItemsValue] : item;
-            $ctrl.ngModelCtrl.$modelValue = $ctrl.ngModel;
-            $ctrl.ngModelCtrl.$setDirty();
-            $element.find('input').focus();
-            $ctrl.selectFunction && $ctrl.selectFunction(item);
-            $timeout(function () {
-                $ctrl.searchQuery = $ctrl.ngModel[$ctrl.uiPrimaryInfo];
-                $ctrl.hideItems();
-            });
-        };
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiChipsController.$inject = ["$element", "$timeout"];
-    angular.module('smn-ui').component('uiChips', {
-        controller: uiChipsController,
-        require: {
-            ngModelCtrl: 'ngModel'
-        },
-        template:'<ui-chip ng-repeat="$chip in $ctrl.ngModel" ng-keydown="$ctrl.chipKeyAction($event, $index)"></ui-chip><input type="text" ng-model="$ctrl.searchQuery" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()" ng-change="$ctrl.checkFilteredItems($ctrl.uiItemsFiltered)" ng-keydown="$ctrl.inputKeyAction($event)" ng-attr-placeholder="{{($ctrl.ngModel.length ? $ctrl.secondaryPlaceholder : \'\') || $ctrl.placeholder }}"><ui-card class="ui-chip-autocomplete" ng-if="$ctrl.uiItems && $ctrl.itemsShown" tabindex="-1" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 1;"><ul class="ui-list s-l1 s-dense clickable"><li ng-repeat="item in $ctrl.uiItemsFiltered = ($ctrl.uiItems | uiFilterBy:$ctrl.searchQuery:[$ctrl.uiPrimaryInfo] | filter:$ctrl.filterRemoveSelected | limitTo: $ctrl.uiLimit) track by (ctrl.uiTrackBy || $index)"><div class="item-cover blue" ng-click="$ctrl.selectItem(item)" ng-class="{\'focused\': $ctrl.focusedIndex === $index}"><div class="list-text" ng-bind="$ctrl.uiPrimaryInfo ? item[$ctrl.uiPrimaryInfo] : item"></div></div></li></ul></ui-card>',
-        bindings: {
-            'ngModel': '=',
-            'uiItems': '=',
-            'required': '=',
-            'uiItemsValue': '@',
-            'uiPrimaryInfo': '@',
-            'chipTemplateUrl': '@',
-            'uiItemsAllowCustom': '@',
-            'changeFunction': '=?',
-            'uiTrackBy': '@',
-            'uiSearchQuery': '=searchQuery',
-            'placeholder': '@',
-            'secondaryPlaceholder': '@',
-            'uiLimit': '=',
-            'min': '=',
-            'max': '=',
-            'name': '@'
-        }
-    });
-
-    function uiChipsController($element, $timeout) {
-        var $ctrl = this;
-        $ctrl.ngModel = $ctrl.ngModel || [];
-        $ctrl.uiItemsFiltered = [];
-        $ctrl.focusedIndex = 0;
-        $ctrl.$onInit = function () {
-            $element.attr('tabindex', -1);
-            $element.bind('click', function (e) {
-                if (angular.element(e.target).is('ui-chips')) $element.find('input').focus();
-            });
-            $element.on('focus', '> *', function (e) {
-                $element.addClass('ui-focused');
-            });
-            $element.on('blur', '> *', function (e) {
-                $element.removeClass('ui-focused');
-            });
-            $ctrl.ngModelCtrl.$validators.min = isMinValid;
-        };
-
-        function isMinValid(value) {
-            return !angular.isNumber($ctrl.min) || value.length >= $ctrl.min;
-        }
-
-        function isMaxValid(value) {
-            return !angular.isNumber($ctrl.max) || value.length <= $ctrl.max;
-        }
-
-        $ctrl.chipKeyAction = function (event, index) {
-            if ([8, 46].indexOf(event.which) > -1) {
-                $ctrl.removeChip(index);
-                var focusIndex = !$ctrl.ngModel.length ? 1 : index === $ctrl.ngModel.length ? index - 1 : index + 1;
-                $element.children().eq(focusIndex).focus();
-            }
-        };
-
-        $ctrl.inputKeyAction = function (event) {
-            switch (event.which) {
-                case 8:
-                case 37:
-                    if ($ctrl.ngModel && !$ctrl.searchQuery) $element.children('input').prev().focus();
-                    break;
-                case 38:
-                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.focusedIndex ? $ctrl.focusedIndex - 1 : $ctrl.uiItemsFiltered.length - 1;
-                    break;
-                case 40:
-                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.uiItemsFiltered.length - 1 === $ctrl.focusedIndex ? 0 : $ctrl.focusedIndex + 1;
-                    break;
-                case 13:
-                    if ($ctrl.searchQuery && !$ctrl.uiItems) {
-                        $ctrl.ngModel.indexOf($ctrl.searchQuery) === -1 && $ctrl.ngModel.push(angular.copy($ctrl.searchQuery));
-                        $ctrl.searchQuery = '';
-                    } else if ($ctrl.uiItemsFiltered) {
-                        if (typeof $ctrl.focusedIndex === 'number') $ctrl.selectItem($ctrl.uiItemsFiltered[$ctrl.focusedIndex]);
-                    }
-                    event.preventDefault();
-                    break;
-            }
-        };
-
-        var hideTimeout;
-        $ctrl.itemsShown = false;
-        $ctrl.showItems = function () {
-            $timeout.cancel(hideTimeout);
-            $ctrl.itemsShown = true;
-            $timeout(function () {
-                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            });
-        };
-        $ctrl.hideItems = function () {
-            hideTimeout = $timeout(function () {
-                $ctrl.itemsShown = false;
-                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            });
-        };
-        $ctrl.filterRemoveSelected = function (item) {
-            if ($ctrl.uiTrackBy) {
-                for (var i = 0; i < $ctrl.ngModel.length; i++) {
-                    if ($ctrl.ngModel[i][$ctrl.uiTrackBy] === item[$ctrl.uiTrackBy]) return false;
-                }
-                return true;
-            }
-            return $ctrl.uiItemsValue ? $ctrl.ngModel.indexOf(item[$ctrl.uiItemsValue]) === -1 : item;
-        };
-        $ctrl.checkFilteredItems = function () {
-            $timeout(function () {
-                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? $ctrl.focusedIndex || 0 : null;
-            });
-        };
-        $ctrl.selectItem = function (item) {
-            $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
-            $ctrl.ngModel.push($ctrl.uiItemsValue ? item[$ctrl.uiItemsValue] : item);
-            $ctrl.ngModelCtrl.$modelValue = $ctrl.ngModel;
-            $ctrl.changeFunction && $ctrl.changeFunction(item);
-            $element.find('input').focus();
-            $ctrl.searchQuery = '';
-            $ctrl.ngModelCtrl.$setDirty();
-            $ctrl.ngModelCtrl.$setValidity('min', isMinValid($ctrl.ngModel));
-            $ctrl.ngModelCtrl.$setValidity('max', isMaxValid($ctrl.ngModel));
-        };
-        $ctrl.removeChip = function (index) {
-            if ($ctrl.ngModel.constructor !== Array) return;
-            $ctrl.ngModel.splice(index, 1);
-            $ctrl.changeFunction && $ctrl.changeFunction();
-            $ctrl.ngModelCtrl.$setDirty();
-            $ctrl.ngModelCtrl.$setValidity('min', isMinValid($ctrl.ngModel));
-            $ctrl.ngModelCtrl.$setValidity('max', isMaxValid($ctrl.ngModel));
-        };
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiChip', uiChip);
-
-    uiChip.$inject = ['$timeout'];
-
-    /* @ngInject */
-    function uiChip($timeout) {
-        var directive = {
-            require: '^^uiChips',
-            template:'<span ng-if="!ctrl.chipTemplateUrl" ng-bind="ctrl.uiItemsValue ? (ctrl.uiItems | filter:{ idUnidade: $chip })[0][ctrl.uiPrimaryInfo] || $chip : (ctrl.uiPrimaryInfo ? $chip[ctrl.uiPrimaryInfo] : $chip)"></span> <button type="button" ng-click="ctrl.removeChip($index)" class="remove-chip" tabindex="-1"><i class="material-icons">clear</i></button><chip-template ng-if="ctrl.chipTemplateUrl" ng-include="ctrl.chipTemplateUrl"></chip-template>',
-            link: link,
-            restrict: 'E'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            scope.ctrl = ctrl;
-            element.attr('tabindex', -1);
-            element.bind('keydown', function (e) {
-                switch (e.keyCode) {
-                    case 37:
-                        var target = element.is(':first-child') ? element.siblings(':last-child') : element.prev();
-                        target.focus();
-                        break;
-                    case 39:
-                        element.next().focus();
-                        break;
-                }
-            });
-        }
-    }
-})();
-'use strict';
-
-(function () {
     'use strict';
 
     angular.module('smn-ui').filter('uiUnaccent', uiUnaccent);
@@ -2257,38 +1977,6 @@
             return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
         }
     }
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').factory('uiWindow', uiWindow);
-
-	uiWindow.$inject = ['$window', '$rootScope'];
-
-	function uiWindow($window, $rootScope) {
-		var service = {};
-
-		angular.element($window).bind('scroll', function () {
-			$rootScope.$apply(getWindowScroll);
-		});
-
-		angular.element($window).bind('resize', function () {
-			$rootScope.$apply(getWindowScroll);
-		});
-
-		function getWindowScroll() {
-			service.scrollX = $window.scrollX;
-			service.scrollY = $window.scrollY;
-			service.innerWidth = $window.innerWidth;
-			service.innerHeight = $window.innerHeight;
-		}
-
-		getWindowScroll();
-
-		return service;
-	}
 })();
 'use strict';
 
@@ -2860,6 +2548,51 @@
 'use strict';
 
 (function () {
+	'use strict';
+
+	angular.module('smn-ui').directive('uiProfileFloat', uiProfileFloat);
+
+	uiProfileFloat.$inject = ['$templateCache', '$interval'];
+
+	function uiProfileFloat($templateCache, $interval) {
+		var directive = {
+			restrict: 'E',
+			scope: {
+				src: '='
+			},
+			transclude: true,
+			template:'<div ng-if="!src" ng-transclude></div><img ng-src="{{src}}" ng-if="src" ng-style="{\'max-width\': !higherWidth ? \'100%\' : \'\', \'max-height\': higherWidth ? \'100%\' : \'\'}">',
+			link: link
+		};
+		return directive;
+
+		function link(scope, element) {
+			var loaded = false,
+			    img = element.find('img'),
+			    wait;
+			scope.$watch('src', function (value) {
+				if (!value) return;
+				wait = $interval(function () {
+					if (loaded) $interval.cancel(wait);
+					scope.higherWidth = !img[0] || img[0].naturalWidth > img[0].naturalHeight;
+				}, 0);
+			});
+			img.on('load', function (e) {
+				scope.$apply(function () {
+					loaded = true;
+				});
+			});
+			img.on('error', function (e) {
+				scope.$apply(function () {
+					loaded = true;
+				});
+			});
+		}
+	}
+})();
+'use strict';
+
+(function () {
     'use strict';
 
     angular.module('smn-ui').directive('uiMultiHandle', uiMultiHandle);
@@ -3012,51 +2745,6 @@
             }
         }
     }
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').directive('uiProfileFloat', uiProfileFloat);
-
-	uiProfileFloat.$inject = ['$templateCache', '$interval'];
-
-	function uiProfileFloat($templateCache, $interval) {
-		var directive = {
-			restrict: 'E',
-			scope: {
-				src: '='
-			},
-			transclude: true,
-			template:'<div ng-if="!src" ng-transclude></div><img ng-src="{{src}}" ng-if="src" ng-style="{\'max-width\': !higherWidth ? \'100%\' : \'\', \'max-height\': higherWidth ? \'100%\' : \'\'}">',
-			link: link
-		};
-		return directive;
-
-		function link(scope, element) {
-			var loaded = false,
-			    img = element.find('img'),
-			    wait;
-			scope.$watch('src', function (value) {
-				if (!value) return;
-				wait = $interval(function () {
-					if (loaded) $interval.cancel(wait);
-					scope.higherWidth = !img[0] || img[0].naturalWidth > img[0].naturalHeight;
-				}, 0);
-			});
-			img.on('load', function (e) {
-				scope.$apply(function () {
-					loaded = true;
-				});
-			});
-			img.on('error', function (e) {
-				scope.$apply(function () {
-					loaded = true;
-				});
-			});
-		}
-	}
 })();
 'use strict';
 
@@ -3475,6 +3163,394 @@
                 return false;
             }
         });
+    }
+})();
+'use strict';
+
+(function () {
+  'use strict';
+
+  angular.module('smn-ui').component('uiSwitch', {
+    controller: uiSwitchController
+  });
+
+  uiSwitchController.$inject = ['$element'];
+
+  function uiSwitchController($element) {
+    var $ctrl = this;
+    $ctrl.$postLink = function () {
+      $element.wrapInner('<label></label>');
+      $element.find('input').addClass('ui-switch').after('<div class="switch-cover"><div class="track"></div><div class="thumb-container"><div class="thumb"></div></div></div>');
+    };
+  }
+})();
+'use strict';
+
+(function () {
+  'use strict';
+
+  angular.module('smn-ui').component('uiOption', {
+    controller: uiOptionController
+  });
+
+  uiOptionController.$inject = ['$element'];
+
+  function uiOptionController($element) {
+    var $ctrl = this;
+    $ctrl.$postLink = function () {
+      $element.wrapInner('<label></label>');
+      $element.find('input').addClass('ui-option').after('<div class="ui-option-shell"><div class="ui-option-fill"></div><div class="ui-option-mark"></div></div>');
+    };
+  }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').component('uiInputContainer', {
+        controller: uiInputContainerController,
+        require: '?ngModel',
+        bindings: {
+            'ngModel': '=?'
+        }
+    });
+
+    uiInputContainerController.$inject = ['$element'];
+    function uiInputContainerController($element) {
+        var $ctrl = this;
+
+        $ctrl.$postLink = function () {
+            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
+        };
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiChipsController.$inject = ["$element", "$timeout"];
+    angular.module('smn-ui').component('uiChips', {
+        controller: uiChipsController,
+        require: {
+            ngModelCtrl: 'ngModel'
+        },
+        template:'<ui-chip ng-repeat="$chip in $ctrl.ngModel" ng-keydown="$ctrl.chipKeyAction($event, $index)"></ui-chip><input type="text" ng-model="$ctrl.searchQuery" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()" ng-change="$ctrl.checkFilteredItems($ctrl.uiItemsFiltered)" ng-keydown="$ctrl.inputKeyAction($event)" ng-attr-placeholder="{{($ctrl.ngModel.length ? $ctrl.secondaryPlaceholder : \'\') || $ctrl.placeholder }}"><ui-card class="ui-chip-autocomplete" ng-if="$ctrl.uiItems && $ctrl.itemsShown" tabindex="-1" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 1;"><ul class="ui-list s-l1 s-dense clickable"><li ng-repeat="item in $ctrl.uiItemsFiltered = ($ctrl.uiItems | uiFilterBy:$ctrl.searchQuery:[$ctrl.uiPrimaryInfo] | filter:$ctrl.filterRemoveSelected | limitTo: $ctrl.uiLimit) track by (ctrl.uiTrackBy || $index)"><div class="item-cover blue" ng-click="$ctrl.selectItem(item)" ng-class="{\'focused\': $ctrl.focusedIndex === $index}"><div class="list-text" ng-bind="$ctrl.uiPrimaryInfo ? item[$ctrl.uiPrimaryInfo] : item"></div></div></li></ul></ui-card>',
+        bindings: {
+            'ngModel': '=',
+            'uiItems': '=',
+            'required': '=',
+            'uiItemsValue': '@',
+            'uiPrimaryInfo': '@',
+            'chipTemplateUrl': '@',
+            'uiItemsAllowCustom': '@',
+            'changeFunction': '=?',
+            'uiTrackBy': '@',
+            'uiSearchQuery': '=searchQuery',
+            'placeholder': '@',
+            'secondaryPlaceholder': '@',
+            'uiLimit': '=',
+            'min': '=',
+            'max': '=',
+            'name': '@'
+        }
+    });
+
+    function uiChipsController($element, $timeout) {
+        var $ctrl = this;
+        $ctrl.ngModel = $ctrl.ngModel || [];
+        $ctrl.uiItemsFiltered = [];
+        $ctrl.focusedIndex = 0;
+        $ctrl.$onInit = function () {
+            $element.attr('tabindex', -1);
+            $element.bind('click', function (e) {
+                if (angular.element(e.target).is('ui-chips')) $element.find('input').focus();
+            });
+            $element.on('focus', '> *', function (e) {
+                $element.addClass('ui-focused');
+            });
+            $element.on('blur', '> *', function (e) {
+                $element.removeClass('ui-focused');
+            });
+            $ctrl.ngModelCtrl.$validators.min = isMinValid;
+        };
+
+        function isMinValid(value) {
+            return !angular.isNumber($ctrl.min) || value.length >= $ctrl.min;
+        }
+
+        function isMaxValid(value) {
+            return !angular.isNumber($ctrl.max) || value.length <= $ctrl.max;
+        }
+
+        $ctrl.chipKeyAction = function (event, index) {
+            if ([8, 46].indexOf(event.which) > -1) {
+                $ctrl.removeChip(index);
+                var focusIndex = !$ctrl.ngModel.length ? 1 : index === $ctrl.ngModel.length ? index - 1 : index + 1;
+                $element.children().eq(focusIndex).focus();
+            }
+        };
+
+        $ctrl.inputKeyAction = function (event) {
+            switch (event.which) {
+                case 8:
+                case 37:
+                    if ($ctrl.ngModel && !$ctrl.searchQuery) $element.children('input').prev().focus();
+                    break;
+                case 38:
+                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.focusedIndex ? $ctrl.focusedIndex - 1 : $ctrl.uiItemsFiltered.length - 1;
+                    break;
+                case 40:
+                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.uiItemsFiltered.length - 1 === $ctrl.focusedIndex ? 0 : $ctrl.focusedIndex + 1;
+                    break;
+                case 13:
+                    if ($ctrl.searchQuery && !$ctrl.uiItems) {
+                        $ctrl.ngModel.indexOf($ctrl.searchQuery) === -1 && $ctrl.ngModel.push(angular.copy($ctrl.searchQuery));
+                        $ctrl.searchQuery = '';
+                    } else if ($ctrl.uiItemsFiltered) {
+                        if (typeof $ctrl.focusedIndex === 'number') $ctrl.selectItem($ctrl.uiItemsFiltered[$ctrl.focusedIndex]);
+                    }
+                    event.preventDefault();
+                    break;
+            }
+        };
+
+        var hideTimeout;
+        $ctrl.itemsShown = false;
+        $ctrl.showItems = function () {
+            $timeout.cancel(hideTimeout);
+            $ctrl.itemsShown = true;
+            $timeout(function () {
+                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            });
+        };
+        $ctrl.hideItems = function () {
+            hideTimeout = $timeout(function () {
+                $ctrl.itemsShown = false;
+                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            });
+        };
+        $ctrl.filterRemoveSelected = function (item) {
+            if ($ctrl.uiTrackBy) {
+                for (var i = 0; i < $ctrl.ngModel.length; i++) {
+                    if ($ctrl.ngModel[i][$ctrl.uiTrackBy] === item[$ctrl.uiTrackBy]) return false;
+                }
+                return true;
+            }
+            return $ctrl.uiItemsValue ? $ctrl.ngModel.indexOf(item[$ctrl.uiItemsValue]) === -1 : item;
+        };
+        $ctrl.checkFilteredItems = function () {
+            $timeout(function () {
+                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? $ctrl.focusedIndex || 0 : null;
+            });
+        };
+        $ctrl.selectItem = function (item) {
+            $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            $ctrl.ngModel.push($ctrl.uiItemsValue ? item[$ctrl.uiItemsValue] : item);
+            $ctrl.ngModelCtrl.$modelValue = $ctrl.ngModel;
+            $ctrl.changeFunction && $ctrl.changeFunction(item);
+            $element.find('input').focus();
+            $ctrl.searchQuery = '';
+            $ctrl.ngModelCtrl.$setDirty();
+            $ctrl.ngModelCtrl.$setValidity('min', isMinValid($ctrl.ngModel));
+            $ctrl.ngModelCtrl.$setValidity('max', isMaxValid($ctrl.ngModel));
+        };
+        $ctrl.removeChip = function (index) {
+            if ($ctrl.ngModel.constructor !== Array) return;
+            $ctrl.ngModel.splice(index, 1);
+            $ctrl.changeFunction && $ctrl.changeFunction();
+            $ctrl.ngModelCtrl.$setDirty();
+            $ctrl.ngModelCtrl.$setValidity('min', isMinValid($ctrl.ngModel));
+            $ctrl.ngModelCtrl.$setValidity('max', isMaxValid($ctrl.ngModel));
+        };
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiChip', uiChip);
+
+    uiChip.$inject = ['$timeout'];
+
+    /* @ngInject */
+    function uiChip($timeout) {
+        var directive = {
+            require: '^^uiChips',
+            template:'<span ng-if="!ctrl.chipTemplateUrl" ng-bind="ctrl.uiItemsValue ? (ctrl.uiItems | filter:{ idUnidade: $chip })[0][ctrl.uiPrimaryInfo] || $chip : (ctrl.uiPrimaryInfo ? $chip[ctrl.uiPrimaryInfo] : $chip)"></span> <button type="button" ng-click="ctrl.removeChip($index)" class="remove-chip" tabindex="-1"><i class="material-icons">clear</i></button><chip-template ng-if="ctrl.chipTemplateUrl" ng-include="ctrl.chipTemplateUrl"></chip-template>',
+            link: link,
+            restrict: 'E'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            scope.ctrl = ctrl;
+            element.attr('tabindex', -1);
+            element.bind('keydown', function (e) {
+                switch (e.keyCode) {
+                    case 37:
+                        var target = element.is(':first-child') ? element.siblings(':last-child') : element.prev();
+                        target.focus();
+                        break;
+                    case 39:
+                        element.next().focus();
+                        break;
+                }
+            });
+        }
+    }
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
+	angular.module('smn-ui').factory('uiWindow', uiWindow);
+
+	uiWindow.$inject = ['$window', '$rootScope'];
+
+	function uiWindow($window, $rootScope) {
+		var service = {};
+
+		angular.element($window).bind('scroll', function () {
+			$rootScope.$apply(getWindowScroll);
+		});
+
+		angular.element($window).bind('resize', function () {
+			$rootScope.$apply(getWindowScroll);
+		});
+
+		function getWindowScroll() {
+			service.scrollX = $window.scrollX;
+			service.scrollY = $window.scrollY;
+			service.innerWidth = $window.innerWidth;
+			service.innerHeight = $window.innerHeight;
+		}
+
+		getWindowScroll();
+
+		return service;
+	}
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiAutocompleteController.$inject = ["$element", "$timeout"];
+    angular.module('smn-ui').component('uiAutocomplete', {
+        controller: uiAutocompleteController,
+        require: {
+            ngModelCtrl: 'ngModel'
+        },
+        template:'<ui-input-container><input type="text" ng-model="$ctrl.searchQuery" ng-focus="$ctrl.blur($ctrl.searchQuery); $ctrl.uiFocus()" ng-blur="$ctrl.hideItems(); $ctrl.uiBlur()" ng-change="$ctrl.searchItem($ctrl.searchQuery); $ctrl.uiChange()" ng-keydown="$ctrl.inputKeyAction($event)" ng-disabled="$ctrl.uiDisabled" ng-attr-placeholder="{{$ctrl.placeholder}}"> <label class="keep-float" ng-bind="$ctrl.uiLabel"></label></ui-input-container><ui-card class="ui-autocomplete-suggestions" ng-if="$ctrl.uiItems && $ctrl.itemsShown" tabindex="-1" ng-focus="$ctrl.showItems()" ng-blur="$ctrl.hideItems()"><ul class="ui-list s-l1 s-dense"><li class="clickable" ng-repeat="item in $ctrl.uiItemsFiltered = $ctrl.uiItems track by (ctrl.uiTrackBy || $index)"><div class="item-cover blue" ng-click="$ctrl.selectItem(item)" ng-class="{\'focused\': $ctrl.focusedIndex === $index}"><div class="list-text"><span ng-bind="$ctrl.uiPrimaryInfo ? item[$ctrl.uiPrimaryInfo] : item"></span><div class="ui-secondary" ng-if="$ctrl.uiSecondaryInfo" ng-bind="$ctrl.uiSecondaryInfo ? item[$ctrl.uiSecondaryInfo] : item"></div></div></div></li><li ng-if="!$ctrl.uiItems.length"><div class="item-cover"><div class="list-text ui-ellipsis">Nenhum resultado encontrado para "{{$ctrl.searchQuery}}"</div></div></li></ul></ui-card>',
+        bindings: {
+            'ngModel': '=',
+            'uiItems': '=',
+            'required': '=',
+            'uiDisabled': '=',
+            'uiItemsValue': '@',
+            'uiPrimaryInfo': '@',
+            'uiSecondaryInfo': '@',
+            'uiLabel': '@',
+            'uiTrackBy': '@',
+            'searchQuery': '=uiSearchQuery',
+            'searchFunction': '=uiSearchFunction',
+            'selectFunction': '=uiSelectFunction',
+            'uiFocus': '&',
+            'uiBlur': '&',
+            'uiChange': '&',
+            'placeholder': '@',
+            'name': '@'
+        }
+    });
+
+    function uiAutocompleteController($element, $timeout) {
+        var $ctrl = this;
+        $ctrl.ngModel = $ctrl.ngModel || [];
+        $ctrl.uiItemsFiltered = [];
+        $ctrl.focusedIndex = 0;
+        $ctrl.$onInit = function () {
+
+            $element.attr('tabindex', -1);
+            $element.bind('click', function (e) {
+                if (angular.element(e.target).is('ui-autocomplete')) $element.find('input').focus();
+            });
+            $element.on('focus', '> *', function (e) {
+                $element.addClass('ui-focused');
+            });
+            $element.on('blur', '> *', function (e) {
+                $element.removeClass('ui-focused');
+            });
+        };
+
+        $ctrl.inputKeyAction = function (event) {
+            switch (event.which) {
+                case 8:
+                case 37:
+                    if ($ctrl.ngModel && !$ctrl.searchQuery) $element.children('input').prev().focus();
+                    break;
+                case 38:
+                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.focusedIndex ? $ctrl.focusedIndex - 1 : $ctrl.uiItemsFiltered.length - 1;
+                    break;
+                case 40:
+                    $ctrl.focusedIndex = !$ctrl.uiItemsFiltered.length ? null : $ctrl.uiItemsFiltered.length - 1 === $ctrl.focusedIndex ? 0 : $ctrl.focusedIndex + 1;
+                    break;
+                case 13:
+                    if ($ctrl.searchQuery && !$ctrl.uiItems) {
+                        $ctrl.searchQuery = '';
+                    } else if ($ctrl.uiItemsFiltered) {
+                        if (typeof $ctrl.focusedIndex === 'number') $ctrl.selectItem($ctrl.uiItemsFiltered[$ctrl.focusedIndex]);
+                    }
+                    event.preventDefault();
+                    break;
+            }
+        };
+
+        var hideTimeout;
+        var searchTimeout;
+        $ctrl.itemsShown = false;
+        $ctrl.showItems = function () {
+            $timeout.cancel(hideTimeout);
+            $ctrl.itemsShown = true;
+            $timeout(function () {
+                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            });
+        };
+        $ctrl.hideItems = function () {
+            hideTimeout = $timeout(function () {
+                $ctrl.itemsShown = false;
+                $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            });
+        };
+        $ctrl.blur = function (query) {
+            $ctrl.searchFunction(query);
+            $ctrl.showItems();
+        };
+
+        $ctrl.searchItem = function (query) {
+            $ctrl.searchQuery = query;
+            $timeout.cancel(searchTimeout);
+            searchTimeout = $timeout(function () {
+                $ctrl.searchFunction(query);
+                $ctrl.showItems();
+            }, 300);
+        };
+
+        $ctrl.selectItem = function (item) {
+            $ctrl.focusedIndex = $ctrl.uiItemsFiltered.length ? 0 : null;
+            $ctrl.ngModel = $ctrl.uiItemsValue ? item[$ctrl.uiItemsValue] : item;
+            $ctrl.ngModelCtrl.$modelValue = $ctrl.ngModel;
+            $ctrl.ngModelCtrl.$setDirty();
+            $element.find('input').focus();
+            $ctrl.selectFunction && $ctrl.selectFunction(item);
+            $timeout(function () {
+                $ctrl.searchQuery = $ctrl.ngModel[$ctrl.uiPrimaryInfo];
+                $ctrl.hideItems();
+            });
+        };
     }
 })();
 'use strict';
