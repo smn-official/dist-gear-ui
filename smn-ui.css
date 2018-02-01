@@ -1,3 +1,6 @@
+.ui-no-animate {
+  transition: none !important;
+}
 /*============================
     MATERIAL COLORS PALETTE
 ============================*/
@@ -2453,9 +2456,6 @@
   background-color: #FFFFFF;
   color: rgba(0,0,0,.87);
 }
-.ui-no-animate {
-  transition: none !important;
-}
 .ui-avatar-cover {
   position: relative;
   display: -webkit-box;
@@ -3202,6 +3202,113 @@ ui-container.small {
   margin-bottom: 16px;
   color: rgba(0,0,0,0.6);
 }
+.ui-fade-translate.ng-enter-prepare,
+.ui-fade-translate.ng-enter {
+  opacity: 0;
+  -webkit-transform: translate(0,100px);
+  transform: translate(0,100px);
+  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
+}
+
+.ui-fade-translate.ng-enter-active {
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+}
+
+.ui-animation-container > .ui-fade-translate.ng-enter:not(:only-child) {
+  transition-delay: 300ms;
+}
+
+.ui-fade-translate.ng-leave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
+}
+
+.ui-fade-translate.ng-leave-active {
+  opacity: 0;
+  -webkit-transform: translate(0,100px);
+  transform: translate(0,100px);
+}
+
+.ui-fade-translate.vertical.ng-enter-prepare,
+.ui-fade-translate.vertical.ng-enter {
+  opacity: 0;
+  -webkit-transform: translate(-100px,0);
+  transform: translate(-100px,0);
+  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
+}
+
+.ui-fade-translate.enter-right.ng-enter-prepare,
+.ui-fade-translate.enter-right.ng-enter {
+  -webkit-transform: translate(100px,0);
+  transform: translate(100px,0);
+}
+
+.ui-fade-translate.vertical.ng-enter-active {
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+}
+
+.ui-fade-translate.vertical.ng-leave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
+}
+
+.ui-fade-translate.vertical.ng-leave-active {
+  opacity: 0;
+  -webkit-transform: translate(-100px,0);
+  transform: translate(-100px,0);
+}
+
+.ui-fade-translate.leave-right.ng-leave-active {
+  -webkit-transform: translate(100px,0);
+  transform: translate(100px,0);
+}
+
+.ui-fade-translate.ng-enter-prepare .ui-float-container button.float,
+.ui-fade-translate.ng-enter .ui-float-container button.float,
+.ui-fade-translate.ng-leave .ui-float-container button.float {
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  transition: none;
+}
+.ui-expand.ng-animate {
+  transition: 300ms ease-in-out;
+}
+
+.ui-expand.ng-hide {
+  transition: 600ms ease-in-out, width 300ms ease-in-out 150ms, height 300ms ease-in-out 150ms !important;
+}
+
+.ui-expand > * {
+  transition: 150ms ease-in-out;
+}
+
+.ui-expand.ng-hide-animate > * {
+  opacity: 0;
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+  transition: 150ms ease-in-out 300ms;
+}
+
+.ui-expand.ng-hide > * {
+  opacity: 0;
+  transition: 150ms ease-in-out;
+}
 ui-color-picker {
   width: 48px;
   display: block;
@@ -3371,113 +3478,6 @@ ui-color-picker .switch-color-preview.round-rectangle::before {
 
 ui-color-picker .switch-color-preview.round-rectangle.no-color::after {
   height: 150%;
-}
-.ui-fade-translate.ng-enter-prepare,
-.ui-fade-translate.ng-enter {
-  opacity: 0;
-  -webkit-transform: translate(0,100px);
-  transform: translate(0,100px);
-  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
-}
-
-.ui-fade-translate.ng-enter-active {
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-}
-
-.ui-animation-container > .ui-fade-translate.ng-enter:not(:only-child) {
-  transition-delay: 300ms;
-}
-
-.ui-fade-translate.ng-leave {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
-}
-
-.ui-fade-translate.ng-leave-active {
-  opacity: 0;
-  -webkit-transform: translate(0,100px);
-  transform: translate(0,100px);
-}
-
-.ui-fade-translate.vertical.ng-enter-prepare,
-.ui-fade-translate.vertical.ng-enter {
-  opacity: 0;
-  -webkit-transform: translate(-100px,0);
-  transform: translate(-100px,0);
-  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
-}
-
-.ui-fade-translate.enter-right.ng-enter-prepare,
-.ui-fade-translate.enter-right.ng-enter {
-  -webkit-transform: translate(100px,0);
-  transform: translate(100px,0);
-}
-
-.ui-fade-translate.vertical.ng-enter-active {
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-}
-
-.ui-fade-translate.vertical.ng-leave {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
-}
-
-.ui-fade-translate.vertical.ng-leave-active {
-  opacity: 0;
-  -webkit-transform: translate(-100px,0);
-  transform: translate(-100px,0);
-}
-
-.ui-fade-translate.leave-right.ng-leave-active {
-  -webkit-transform: translate(100px,0);
-  transform: translate(100px,0);
-}
-
-.ui-fade-translate.ng-enter-prepare .ui-float-container button.float,
-.ui-fade-translate.ng-enter .ui-float-container button.float,
-.ui-fade-translate.ng-leave .ui-float-container button.float {
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  transition: none;
-}
-.ui-expand.ng-animate {
-  transition: 300ms ease-in-out;
-}
-
-.ui-expand.ng-hide {
-  transition: 600ms ease-in-out, width 300ms ease-in-out 150ms, height 300ms ease-in-out 150ms !important;
-}
-
-.ui-expand > * {
-  transition: 150ms ease-in-out;
-}
-
-.ui-expand.ng-hide-animate > * {
-  opacity: 0;
-  -webkit-transform: translateY(-2px);
-  transform: translateY(-2px);
-  transition: 150ms ease-in-out 300ms;
-}
-
-.ui-expand.ng-hide > * {
-  opacity: 0;
-  transition: 150ms ease-in-out;
 }
 ui-calendar {
   display: -webkit-inline-box;
@@ -3983,80 +3983,6 @@ ui-menu .title {
   color: rgba(0,0,0,0.7);
   padding: 10px;
 }
-ui-floating-card {
-  display: -webkit-box;
-  display: flex;
-  position: fixed;
-  overflow: auto;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2000;
-  padding: 15px;
-  background-color: rgba(0,0,0,0.2);
-}
-
-ui-floating-card-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-}
-
-ui-floating-card-content {
-  margin: auto;
-  display: block;
-  max-width: 100%;
-}
-
-ui-floating-card.ng-enter {
-  overflow: hidden;
-  background-color: transparent;
-  transition: 300ms ease-in-out;
-}
-
-ui-floating-card.ng-enter-active {
-  background-color: rgba(0,0,0,0.2);
-}
-
-ui-floating-card.ng-enter ui-card {
-  -webkit-transform: translateY(100vw);
-  transform: translateY(100vw);
-  transition: 200ms ease-in-out;
-}
-
-ui-floating-card.ng-enter-active ui-card {
-  -webkit-transform: translateY(0);
-  transform: translateY(0);
-}
-
-ui-floating-card.ng-leave {
-  overflow: hidden;
-  background-color: rgba(0,0,0,0.2);
-  transition: 200ms ease-in-out;
-}
-
-ui-floating-card.ng-leave-active {
-  background-color: transparent;
-}
-
-ui-floating-card.ng-leave ui-card {
-  -webkit-transform: translateY(0);
-  transform: translateY(0);
-  transition: 200ms ease-in-out;
-}
-
-ui-floating-card.ng-leave-active ui-card {
-  -webkit-transform: translateY(100vw);
-  transform: translateY(100vw);
-}
-
-ui-floating-card ui-card-wrap {
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-}
 .ui-list {
   list-style-type: none;
 }
@@ -4554,6 +4480,80 @@ ui-floating-card ui-card-wrap {
     min-height: 60px;
   }
 }
+ui-floating-card {
+  display: -webkit-box;
+  display: flex;
+  position: fixed;
+  overflow: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  padding: 15px;
+  background-color: rgba(0,0,0,0.2);
+}
+
+ui-floating-card-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+ui-floating-card-content {
+  margin: auto;
+  display: block;
+  max-width: 100%;
+}
+
+ui-floating-card.ng-enter {
+  overflow: hidden;
+  background-color: transparent;
+  transition: 300ms ease-in-out;
+}
+
+ui-floating-card.ng-enter-active {
+  background-color: rgba(0,0,0,0.2);
+}
+
+ui-floating-card.ng-enter ui-card {
+  -webkit-transform: translateY(100vw);
+  transform: translateY(100vw);
+  transition: 200ms ease-in-out;
+}
+
+ui-floating-card.ng-enter-active ui-card {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+
+ui-floating-card.ng-leave {
+  overflow: hidden;
+  background-color: rgba(0,0,0,0.2);
+  transition: 200ms ease-in-out;
+}
+
+ui-floating-card.ng-leave-active {
+  background-color: transparent;
+}
+
+ui-floating-card.ng-leave ui-card {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+  transition: 200ms ease-in-out;
+}
+
+ui-floating-card.ng-leave-active ui-card {
+  -webkit-transform: translateY(100vw);
+  transform: translateY(100vw);
+}
+
+ui-floating-card ui-card-wrap {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
 ui-multi-handle {
   display: -webkit-box;
   display: flex;
@@ -4947,153 +4947,6 @@ ui-snack-bar + ui-snack-bar {
   transition-delay: 200ms;
   visibility: hidden;
 }
-ui-spinner {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-}
-
-ui-spinner.s32 {
-  width: 32px;
-  height: 32px;
-}
-
-ui-spinner.s64 {
-  width: 64px;
-  height: 64px;
-}
-
-ui-spinner svg {
-  width: 100%;
-  height: 100%;
-  -webkit-animation: 1568.63ms ui-spinner-rotate-out linear infinite;
-  animation: 1568.63ms ui-spinner-rotate-out linear infinite;
-}
-
-ui-spinner path {
-  -webkit-transform-origin: 50% 50%;
-  transform-origin: 50% 50%;
-  stroke-dasharray: 58.9;
-  stroke-dashoffset: 0;
-  stroke: #2196F3;
-  stroke-width: 3px;
-  -webkit-animation-name: ui-spinner-stroke-offset, ui-spinner-rotate;
-  animation-name: ui-spinner-stroke-offset, ui-spinner-rotate;
-  -webkit-animation-duration: 1333ms, 5332ms, 5332ms;
-  animation-duration: 1333ms, 5332ms, 5332ms;
-  -webkit-animation-iteration-count: infinite, infinite, infinite;
-  animation-iteration-count: infinite, infinite, infinite;
-  -webkit-animation-play-state: running, running, running;
-  animation-play-state: running, running, running;
-  -webkit-animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1), steps(4), linear;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1), steps(4), linear;
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-}
-
-ui-spinner.dark path {
-  stroke: white;
-}
-
-ui-spinner.light path {
-  stroke: rgba(0,0,0,0.6);
-}
-
-@-webkit-keyframes ui-spinner-rotate-out {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes ui-spinner-rotate-out {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-
-@-webkit-keyframes ui-spinner-stroke-offset {
-  0% {
-    stroke-dashoffset: 58.8;
-  }
-
-  50% {
-    stroke-dashoffset: 0;
-  }
-
-  100% {
-    stroke-dashoffset: -58.4;
-  }
-}
-
-@keyframes ui-spinner-stroke-offset {
-  0% {
-    stroke-dashoffset: 58.8;
-  }
-
-  50% {
-    stroke-dashoffset: 0;
-  }
-
-  100% {
-    stroke-dashoffset: -58.4;
-  }
-}
-
-@-webkit-keyframes ui-spinner-rotate {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(-360deg);
-    transform: rotate(-360deg);
-  }
-}
-
-@keyframes ui-spinner-rotate {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(-360deg);
-    transform: rotate(-360deg);
-  }
-}
-
-@-webkit-keyframes ui-spinner-color {
-  0% {
-    stroke: black;
-  }
-
-  100% {
-    stroke: #666;
-  }
-}
-
-@keyframes ui-spinner-color {
-  0% {
-    stroke: black;
-  }
-
-  100% {
-    stroke: #666;
-  }
-}
 .ui-table {
   overflow: auto;
   text-align: left;
@@ -5478,6 +5331,153 @@ ui-tabs .scroll-helper .left {
 
 ui-tabs .scroll-helper .show {
   opacity: 1;
+}
+ui-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+}
+
+ui-spinner.s32 {
+  width: 32px;
+  height: 32px;
+}
+
+ui-spinner.s64 {
+  width: 64px;
+  height: 64px;
+}
+
+ui-spinner svg {
+  width: 100%;
+  height: 100%;
+  -webkit-animation: 1568.63ms ui-spinner-rotate-out linear infinite;
+  animation: 1568.63ms ui-spinner-rotate-out linear infinite;
+}
+
+ui-spinner path {
+  -webkit-transform-origin: 50% 50%;
+  transform-origin: 50% 50%;
+  stroke-dasharray: 58.9;
+  stroke-dashoffset: 0;
+  stroke: #2196F3;
+  stroke-width: 3px;
+  -webkit-animation-name: ui-spinner-stroke-offset, ui-spinner-rotate;
+  animation-name: ui-spinner-stroke-offset, ui-spinner-rotate;
+  -webkit-animation-duration: 1333ms, 5332ms, 5332ms;
+  animation-duration: 1333ms, 5332ms, 5332ms;
+  -webkit-animation-iteration-count: infinite, infinite, infinite;
+  animation-iteration-count: infinite, infinite, infinite;
+  -webkit-animation-play-state: running, running, running;
+  animation-play-state: running, running, running;
+  -webkit-animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1), steps(4), linear;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1), steps(4), linear;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+ui-spinner.dark path {
+  stroke: white;
+}
+
+ui-spinner.light path {
+  stroke: rgba(0,0,0,0.6);
+}
+
+@-webkit-keyframes ui-spinner-rotate-out {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ui-spinner-rotate-out {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes ui-spinner-stroke-offset {
+  0% {
+    stroke-dashoffset: 58.8;
+  }
+
+  50% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -58.4;
+  }
+}
+
+@keyframes ui-spinner-stroke-offset {
+  0% {
+    stroke-dashoffset: 58.8;
+  }
+
+  50% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: -58.4;
+  }
+}
+
+@-webkit-keyframes ui-spinner-rotate {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes ui-spinner-rotate {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(-360deg);
+    transform: rotate(-360deg);
+  }
+}
+
+@-webkit-keyframes ui-spinner-color {
+  0% {
+    stroke: black;
+  }
+
+  100% {
+    stroke: #666;
+  }
+}
+
+@keyframes ui-spinner-color {
+  0% {
+    stroke: black;
+  }
+
+  100% {
+    stroke: #666;
+  }
 }
 ui-tree-view,
 ui-tree-view-list,
@@ -7547,6 +7547,26 @@ textarea {
   opacity: 0;
   top: -9999px;
 }
+ui-menu-list {
+  position: relative;
+  z-index: 0;
+  display: block;
+  transition: 200ms ease-in-out;
+}
+
+ui-menu-item > ui-menu-list {
+  opacity: 0;
+  margin: 0 10px;
+}
+
+.is-open > ui-menu-list {
+  opacity: 1;
+  margin: 0;
+}
+
+ui-menu-list.ng-hide {
+  opacity: 0;
+}
 ui-menu-item {
   display: -webkit-box;
   display: flex;
@@ -7634,24 +7654,4 @@ ui-menu-item.is-open {
   border-radius: 2px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.2);
   transition: 200ms ease-in-out;
-}
-ui-menu-list {
-  position: relative;
-  z-index: 0;
-  display: block;
-  transition: 200ms ease-in-out;
-}
-
-ui-menu-item > ui-menu-list {
-  opacity: 0;
-  margin: 0 10px;
-}
-
-.is-open > ui-menu-list {
-  opacity: 1;
-  margin: 0;
-}
-
-ui-menu-list.ng-hide {
-  opacity: 0;
 }

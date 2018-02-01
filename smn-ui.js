@@ -9,6 +9,46 @@
 (function () {
 	'use strict';
 
+	angular.module('smn-ui').directive('uiMenuItem', uiMenuItem);
+
+	uiMenuItem.$inject = ['$compile', '$templateCache'];
+
+	function uiMenuItem($compile, $templateCache) {
+		var directive = {
+			require: '^uiMainMenu',
+			link: link,
+			restrict: 'E',
+			template:'<div class="item-wrap"><a ng-href="{{item[config.href] || \'\'}}" ng-class="{\'has-submenu\': item[config.submenu]}" ng-click="item[config.submenu] ? openMenu() : (item[config.href] && menuClick())"><i class="material-icons option-icon" ng-class="{\'arrow-drop\': item[config.submenu]}" ng-if="item[config.submenu] || item[config.icon]">{{item[config.icon] || \'arrow_drop_down\'}}</i> {{item[config.name]}}</a></div>',
+			scope: {
+				'item': '=',
+				'list': '=',
+				'level': '=',
+				'isOpen': '='
+			}
+		};
+		return directive;
+
+		function link(scope, element, attrs, ctrl) {
+			scope.isOpen = false;
+			scope.menuClick = ctrl.menuClick;
+			scope.config = ctrl.config;
+			scope.openMenu = function () {
+				if (scope.item[scope.config.submenu]) scope.isOpen = !scope.isOpen;
+			};
+			scope.buttonOffset = scope.level != 1 ? 36 * (scope.level - 1) + 'px' : 0;
+			if (scope.list) {
+				$compile('<ui-menu-list class="drawer-slide-vertical" list="list" config="config" parent-level="level" ng-hide="!isOpen"></ui-menu-list>')(scope, function (cloned, scope) {
+					element.append(cloned);
+				});
+			}
+		}
+	}
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
 	angular.module('smn-ui').directive('uiMenuList', uiMenuList);
 
 	uiMenuList.$inject = ['$templateCache'];
@@ -156,46 +196,6 @@
 				}
 			}
 			doneFn();
-		}
-	}
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').directive('uiMenuItem', uiMenuItem);
-
-	uiMenuItem.$inject = ['$compile', '$templateCache'];
-
-	function uiMenuItem($compile, $templateCache) {
-		var directive = {
-			require: '^uiMainMenu',
-			link: link,
-			restrict: 'E',
-			template:'<div class="item-wrap"><a ng-href="{{item[config.href] || \'\'}}" ng-class="{\'has-submenu\': item[config.submenu]}" ng-click="item[config.submenu] ? openMenu() : (item[config.href] && menuClick())"><i class="material-icons option-icon" ng-class="{\'arrow-drop\': item[config.submenu]}" ng-if="item[config.submenu] || item[config.icon]">{{item[config.icon] || \'arrow_drop_down\'}}</i> {{item[config.name]}}</a></div>',
-			scope: {
-				'item': '=',
-				'list': '=',
-				'level': '=',
-				'isOpen': '='
-			}
-		};
-		return directive;
-
-		function link(scope, element, attrs, ctrl) {
-			scope.isOpen = false;
-			scope.menuClick = ctrl.menuClick;
-			scope.config = ctrl.config;
-			scope.openMenu = function () {
-				if (scope.item[scope.config.submenu]) scope.isOpen = !scope.isOpen;
-			};
-			scope.buttonOffset = scope.level != 1 ? 36 * (scope.level - 1) + 'px' : 0;
-			if (scope.list) {
-				$compile('<ui-menu-list class="drawer-slide-vertical" list="list" config="config" parent-level="level" ng-hide="!isOpen"></ui-menu-list>')(scope, function (cloned, scope) {
-					element.append(cloned);
-				});
-			}
 		}
 	}
 })();
@@ -1022,6 +1022,40 @@
 (function () {
     'use strict';
 
+    angular.module('smn-ui').filter('uiFilterBy', uiFilterBy);
+
+    uiFilterBy.$inject = ['uiUnaccentFilter'];
+
+    function uiFilterBy(uiUnaccentFilter) {
+        return function (items, query, props, isCaseInsensitive) {
+            isCaseInsensitive = typeof isCaseInsensitive === 'undefined' ? true : isCaseInsensitive;
+            query = typeof query === 'string' ? query.toLowerCase() : query;
+            query = isCaseInsensitive && query ? uiUnaccentFilter(query) : query;
+            if (!items) return [];
+            return items.filter(function (item) {
+                if (!query) return true;
+                for (var i = 0; i < props.length; i++) {
+                    var value = '',
+                        itemProps = props[i];
+                    if (itemProps.props) {
+                        for (var j = 0; j < itemProps.props.length; j++) {
+                            var subProp = itemProps.props[j];
+                            value += item[subProp] + (j < itemProps.props.length - 1 && itemProps.join ? itemProps.join : '');
+                        }
+                    } else value = item[props[i]];
+                    value = isCaseInsensitive ? uiUnaccentFilter(value) : value;
+                    if (value.toLowerCase().indexOf(query) != -1) return true;
+                }
+                return false;
+            });
+        };
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     angular.module('smn-ui').directive('uiInputFile', uiInputFile);
 
     uiInputFile.$inject = ['$compile'];
@@ -1313,40 +1347,6 @@
                 }
             };
         }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiFilterBy', uiFilterBy);
-
-    uiFilterBy.$inject = ['uiUnaccentFilter'];
-
-    function uiFilterBy(uiUnaccentFilter) {
-        return function (items, query, props, isCaseInsensitive) {
-            isCaseInsensitive = typeof isCaseInsensitive === 'undefined' ? true : isCaseInsensitive;
-            query = typeof query === 'string' ? query.toLowerCase() : query;
-            query = isCaseInsensitive && query ? uiUnaccentFilter(query) : query;
-            if (!items) return [];
-            return items.filter(function (item) {
-                if (!query) return true;
-                for (var i = 0; i < props.length; i++) {
-                    var value = '',
-                        itemProps = props[i];
-                    if (itemProps.props) {
-                        for (var j = 0; j < itemProps.props.length; j++) {
-                            var subProp = itemProps.props[j];
-                            value += item[subProp] + (j < itemProps.props.length - 1 && itemProps.join ? itemProps.join : '');
-                        }
-                    } else value = item[props[i]];
-                    value = isCaseInsensitive ? uiUnaccentFilter(value) : value;
-                    if (value.toLowerCase().indexOf(query) != -1) return true;
-                }
-                return false;
-            });
-        };
     }
 })();
 'use strict';
@@ -1970,6 +1970,85 @@
 'use strict';
 
 (function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiUnaccent', uiUnaccent);
+
+    function uiUnaccent() {
+        return function (strAccents) {
+            if (!strAccents) return '';
+            var strAccents = strAccents.split('');
+            var strAccentsOut = [];
+            var strAccentsLen = strAccents.length;
+            var accents = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
+            var accentsOut = 'AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz';
+            for (var y = 0; y < strAccentsLen; y++) {
+                if (accents.indexOf(strAccents[y]) != -1) {
+                    strAccentsOut[y] = accentsOut.substr(accents.indexOf(strAccents[y]), 1);
+                } else strAccentsOut[y] = strAccents[y];
+            }
+            strAccentsOut = strAccentsOut.join('');
+            return strAccentsOut;
+        };
+    }
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
+	angular.module('smn-ui').filter('uiStringDate', uiFullDate);
+
+	function uiFullDate() {
+		return uiFullDateFilter;
+	}
+	function uiFullDateFilter(date) {
+		var today = new Date(),
+		    yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1),
+		    months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+		    weekDays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+		    sevenDaysInMil = 1000 * 60 * 60 * 24 * 7;
+		today.setHours(0, 0, 0, 0);
+		yesterday.setHours(0, 0, 0, 0);
+		date = new Date(date);
+		date.setHours(0, 0, 0, 0);
+		switch (true) {
+			case today.getTime() === date.getTime():
+				date = 'Hoje';
+				break;
+			case yesterday.getTime() === date.getTime():
+				date = 'Ontem';
+				break;
+			case today.getTime() - sevenDaysInMil <= date.getTime():
+				date = weekDays[date.getDay()];
+				break;
+			default:
+				date = date.getDate() + ' de ' + months[date.getMonth()].toLowerCase() + ' de ' + date.getFullYear();
+				break;
+		}
+		return date;
+	}
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
+
+    function uiCapitalize() {
+        return uiCapitalizeFilter;
+
+        ////////////////
+
+        function uiCapitalizeFilter(value) {
+            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
+        }
+    }
+})();
+'use strict';
+
+(function () {
   'use strict';
 
   angular.module('smn-ui').component('uiSwitch', {
@@ -2326,85 +2405,6 @@
 'use strict';
 
 (function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiUnaccent', uiUnaccent);
-
-    function uiUnaccent() {
-        return function (strAccents) {
-            if (!strAccents) return '';
-            var strAccents = strAccents.split('');
-            var strAccentsOut = [];
-            var strAccentsLen = strAccents.length;
-            var accents = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
-            var accentsOut = 'AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz';
-            for (var y = 0; y < strAccentsLen; y++) {
-                if (accents.indexOf(strAccents[y]) != -1) {
-                    strAccentsOut[y] = accentsOut.substr(accents.indexOf(strAccents[y]), 1);
-                } else strAccentsOut[y] = strAccents[y];
-            }
-            strAccentsOut = strAccentsOut.join('');
-            return strAccentsOut;
-        };
-    }
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').filter('uiStringDate', uiFullDate);
-
-	function uiFullDate() {
-		return uiFullDateFilter;
-	}
-	function uiFullDateFilter(date) {
-		var today = new Date(),
-		    yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1),
-		    months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-		    weekDays = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
-		    sevenDaysInMil = 1000 * 60 * 60 * 24 * 7;
-		today.setHours(0, 0, 0, 0);
-		yesterday.setHours(0, 0, 0, 0);
-		date = new Date(date);
-		date.setHours(0, 0, 0, 0);
-		switch (true) {
-			case today.getTime() === date.getTime():
-				date = 'Hoje';
-				break;
-			case yesterday.getTime() === date.getTime():
-				date = 'Ontem';
-				break;
-			case today.getTime() - sevenDaysInMil <= date.getTime():
-				date = weekDays[date.getDay()];
-				break;
-			default:
-				date = date.getDate() + ' de ' + months[date.getMonth()].toLowerCase() + ' de ' + date.getFullYear();
-				break;
-		}
-		return date;
-	}
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
-
-    function uiCapitalize() {
-        return uiCapitalizeFilter;
-
-        ////////////////
-
-        function uiCapitalizeFilter(value) {
-            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
-        }
-    }
-})();
-'use strict';
-
-(function () {
 	'use strict';
 
 	angular.module('smn-ui').factory('uiWindow', uiWindow);
@@ -2536,6 +2536,25 @@
 				event.preventDefault();
 			}
 		}
+	}
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
+	angular.module('smn-ui').component('uiSpinner', {
+		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
+		controller: uiSpinnerController
+	});
+
+	uiSpinnerController.$inject = ['$element'];
+	function uiSpinnerController($element) {
+		var $ctrl = this;
+
+		$ctrl.$onInit = function () {};
+		$ctrl.$onChanges = function (changesObj) {};
+		$ctrl.$onDestory = function () {};
 	}
 })();
 'use strict';
@@ -2740,25 +2759,6 @@
             });
         }
     }
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').component('uiSpinner', {
-		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
-		controller: uiSpinnerController
-	});
-
-	uiSpinnerController.$inject = ['$element'];
-	function uiSpinnerController($element) {
-		var $ctrl = this;
-
-		$ctrl.$onInit = function () {};
-		$ctrl.$onChanges = function (changesObj) {};
-		$ctrl.$onDestory = function () {};
-	}
 })();
 'use strict';
 
@@ -3250,14 +3250,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 				'list': '=',
 				'idList': '@',
 				'placeholderList': '@',
-				'config': '&',
+				'config': '=',
 				'attrList': '@',
 				'itemDefault': '@',
 				'labelList': '@',
 				'change': '=',
 				'click': '='
 			},
-			template:'<ui-input-container><input placeholder="{{placeholderList}}" ng-change="selected()" list="{{idList}}" ng-model="choosen"><datalist id="{{idList}}"><option ng-repeat="opt in list">{{opt[config.option]}}</option></datalist><label>{{labelList}}</label></ui-input-container>',
+			template:'<ui-input-container><input autocomplete="off" placeholder="{{placeholderList}}" ng-change="selected()" list="{{idList}}" ng-model="choosen"><datalist id="{{idList}}"><option ng-repeat="opt in list">{{opt[config.option]}}</option></datalist><label>{{labelList}}</label></ui-input-container>',
 			link: function link(scope, element, attrs, ngModel) {
 				scope.config = angular.extend(scope.config || {}, {
 					display: null,
@@ -3675,6 +3675,95 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 'use strict';
 
 (function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiColorPicker', ["$timeout", function ($timeout) {
+        return {
+            restrict: 'E',
+            transclude: true,
+            require: ['^form', 'ngModel'],
+            scope: {
+                'ngModel': '=',
+                'uiId': '@',
+                'uiName': '@',
+                'uiClass': '=?',
+                'uiShape': '@',
+                'uiPrimaryInfo': '@',
+                'uiSelect': '&'
+            },
+            template:'<div><div class="ui-icon" ng-style="{\'width\': uiShape == \'round-rectangle\' && \'auto\'}"><div class="switch-color-preview ui-color{{uiShape && \' \' + uiShape}}" ng-class="{\'no-color\': !colorSelected}" ng-style="{\'background-color\': colorSelected ? colorSelected : \'#D01716\'}" data-color-range="300"></div></div><ui-input-container class="no-margin"><input type="text" ng-class="uiClass" name="{{uiName}}" ng-readonly="switchOpened" ng-pattern="/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/" class="txt-color-switch" ng-model="ngModel" ng-focus="switchOpen()" style="user-select: none" autocomplete="off" ng-style="{\'color\': uiShape == \'round-rectangle\' && \'transparent\'}"> <label>Cor</label></ui-input-container><div class="switch-color" ng-if="switchOpened"><div class="no-color" ng-click="setColorType(null)"></div><div ng-repeat="colorType in colorTypes" ng-class="colorClass(\'bg-\' + colorType + \'-500\')" ng-click="setColorType($event, colorType)"></div><div class="switch-var" ng-class="{\'ui-show\':colorTypeSelected}" ng-style="{\'top\': switchVarTop}" style="top: -47px;"><div class="ui-color {{colorTypeSelected != null ? \'bg-\' + colorTypeSelected + \'-\' + colorVariation : \'\'}}" ng-repeat="colorVariation in colorVariations" ng-class="{\'ui-show\':checkAccentColor(colorVariation)}" data-color-range="{{colorVariation}}" ng-click="selectColor($event)"></div><div class="arrow" ng-style="{\'margin-left\': switchVarArrowLeft}" style="margin-left: 57px;"></div></div></div></div>',
+            link: function link(scope, element, attrs, ctrls, transclude) {
+                // element.find('ui-form-transclude').replaceWith(transclude());
+                scope.colorTypes = ['red', 'pink', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue', 'cyan', 'teal', 'green', 'light-green', 'lime', 'yellow', 'amber', 'orange', 'deep-orange', 'brown', 'grey', 'blue-grey'];
+                scope.colorVariations = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', 'A100', 'A200', 'A400', 'A700'];
+                scope.switchOpened = false;
+                scope.colorTypeSelected = undefined;
+                scope.colorSelected = undefined;
+                scope.switchOpen = function () {
+                    scope.colorTypeSelected = undefined;
+                    scope.switchOpened = true;
+                };
+                scope.switchClose = function () {
+                    scope.switchOpened = false;
+                };
+                scope.switchVarTop = undefined;
+                scope.switchVarArrowLeft = undefined;
+                scope.setColorType = function ($event, color) {
+                    scope.colorTypeSelected = color;
+                    if (color == undefined) {
+                        scope.selectColor();
+                        return;
+                    }
+                    scope.switchVarTop = angular.element($event.currentTarget).offset().top - angular.element(element.find('.switch-color')).offset().top - 50;
+                    scope.switchVarArrowLeft = angular.element($event.currentTarget).offset().left - angular.element(element.find('.switch-color')).offset().left + angular.element($event.currentTarget).width() / 2 - 6;
+                };
+                scope.colorClass = function (color) {
+                    return color;
+                };
+                scope.checkAccentColor = function (variation) {
+                    if (scope.colorTypeSelected == 'brown' || scope.colorTypeSelected == 'grey' || scope.colorTypeSelected == 'blue-grey') {
+                        if (variation == 'A100' || variation == 'A200' || variation == 'A400' || variation == 'A700') return false;
+                    }
+                    return true;
+                };
+
+                angular.element(document).bind('mousedown focusin', function (e) {
+                    if (!angular.element(element).find(e.target).length && scope.switchOpened) {
+                        scope.switchClose();
+                        scope.$apply();
+                    }
+                });
+                scope.selectColor = function ($event) {
+                    scope.colorSelected = $event ? rgb2hex($($event.currentTarget).css('background-color')).toUpperCase() : undefined;
+                    ctrls[1].$setViewValue(scope.colorSelected ? scope.colorSelected : 'Nenhuma cor selecionada');
+                    ctrls[1].$render();
+                    ctrls[0][scope.uiName].$setDirty();
+                    scope.switchClose();
+                    $timeout(scope.uiSelect);
+                };
+
+                ctrls[1].$formatters.push(function (value) {
+                    scope.colorSelected = value;
+                    ctrls[1].$setViewValue(value ? value : 'Nenhuma cor selecionada');
+                    ctrls[0].$setPristine(); // Dentro do formatters, faz o campo nascer como pristine, caso contrÃ¡rio ele perde a propriedade
+                    return value;
+                });
+
+                function rgb2hex(rgb) {
+                    var hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+                    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+                    function hex(x) {
+                        return isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+                    }
+                    return '#' + (hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3])).toUpperCase();
+                }
+            }
+        };
+    }]);
+})();
+'use strict';
+
+(function () {
 	'use strict';
 
 	angular.module('smn-ui').animation('.ui-expand', uiExpandAnimation);
@@ -3789,95 +3878,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 			doneFn();
 		}
 	}
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiColorPicker', ["$timeout", function ($timeout) {
-        return {
-            restrict: 'E',
-            transclude: true,
-            require: ['^form', 'ngModel'],
-            scope: {
-                'ngModel': '=',
-                'uiId': '@',
-                'uiName': '@',
-                'uiClass': '=?',
-                'uiShape': '@',
-                'uiPrimaryInfo': '@',
-                'uiSelect': '&'
-            },
-            template:'<div><div class="ui-icon" ng-style="{\'width\': uiShape == \'round-rectangle\' && \'auto\'}"><div class="switch-color-preview ui-color{{uiShape && \' \' + uiShape}}" ng-class="{\'no-color\': !colorSelected}" ng-style="{\'background-color\': colorSelected ? colorSelected : \'#D01716\'}" data-color-range="300"></div></div><ui-input-container class="no-margin"><input type="text" ng-class="uiClass" name="{{uiName}}" ng-readonly="switchOpened" ng-pattern="/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/" class="txt-color-switch" ng-model="ngModel" ng-focus="switchOpen()" style="user-select: none" autocomplete="off" ng-style="{\'color\': uiShape == \'round-rectangle\' && \'transparent\'}"> <label>Cor</label></ui-input-container><div class="switch-color" ng-if="switchOpened"><div class="no-color" ng-click="setColorType(null)"></div><div ng-repeat="colorType in colorTypes" ng-class="colorClass(\'bg-\' + colorType + \'-500\')" ng-click="setColorType($event, colorType)"></div><div class="switch-var" ng-class="{\'ui-show\':colorTypeSelected}" ng-style="{\'top\': switchVarTop}" style="top: -47px;"><div class="ui-color {{colorTypeSelected != null ? \'bg-\' + colorTypeSelected + \'-\' + colorVariation : \'\'}}" ng-repeat="colorVariation in colorVariations" ng-class="{\'ui-show\':checkAccentColor(colorVariation)}" data-color-range="{{colorVariation}}" ng-click="selectColor($event)"></div><div class="arrow" ng-style="{\'margin-left\': switchVarArrowLeft}" style="margin-left: 57px;"></div></div></div></div>',
-            link: function link(scope, element, attrs, ctrls, transclude) {
-                // element.find('ui-form-transclude').replaceWith(transclude());
-                scope.colorTypes = ['red', 'pink', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue', 'cyan', 'teal', 'green', 'light-green', 'lime', 'yellow', 'amber', 'orange', 'deep-orange', 'brown', 'grey', 'blue-grey'];
-                scope.colorVariations = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', 'A100', 'A200', 'A400', 'A700'];
-                scope.switchOpened = false;
-                scope.colorTypeSelected = undefined;
-                scope.colorSelected = undefined;
-                scope.switchOpen = function () {
-                    scope.colorTypeSelected = undefined;
-                    scope.switchOpened = true;
-                };
-                scope.switchClose = function () {
-                    scope.switchOpened = false;
-                };
-                scope.switchVarTop = undefined;
-                scope.switchVarArrowLeft = undefined;
-                scope.setColorType = function ($event, color) {
-                    scope.colorTypeSelected = color;
-                    if (color == undefined) {
-                        scope.selectColor();
-                        return;
-                    }
-                    scope.switchVarTop = angular.element($event.currentTarget).offset().top - angular.element(element.find('.switch-color')).offset().top - 50;
-                    scope.switchVarArrowLeft = angular.element($event.currentTarget).offset().left - angular.element(element.find('.switch-color')).offset().left + angular.element($event.currentTarget).width() / 2 - 6;
-                };
-                scope.colorClass = function (color) {
-                    return color;
-                };
-                scope.checkAccentColor = function (variation) {
-                    if (scope.colorTypeSelected == 'brown' || scope.colorTypeSelected == 'grey' || scope.colorTypeSelected == 'blue-grey') {
-                        if (variation == 'A100' || variation == 'A200' || variation == 'A400' || variation == 'A700') return false;
-                    }
-                    return true;
-                };
-
-                angular.element(document).bind('mousedown focusin', function (e) {
-                    if (!angular.element(element).find(e.target).length && scope.switchOpened) {
-                        scope.switchClose();
-                        scope.$apply();
-                    }
-                });
-                scope.selectColor = function ($event) {
-                    scope.colorSelected = $event ? rgb2hex($($event.currentTarget).css('background-color')).toUpperCase() : undefined;
-                    ctrls[1].$setViewValue(scope.colorSelected ? scope.colorSelected : 'Nenhuma cor selecionada');
-                    ctrls[1].$render();
-                    ctrls[0][scope.uiName].$setDirty();
-                    scope.switchClose();
-                    $timeout(scope.uiSelect);
-                };
-
-                ctrls[1].$formatters.push(function (value) {
-                    scope.colorSelected = value;
-                    ctrls[1].$setViewValue(value ? value : 'Nenhuma cor selecionada');
-                    ctrls[0].$setPristine(); // Dentro do formatters, faz o campo nascer como pristine, caso contrÃ¡rio ele perde a propriedade
-                    return value;
-                });
-
-                function rgb2hex(rgb) {
-                    var hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-                    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-                    function hex(x) {
-                        return isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
-                    }
-                    return '#' + (hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3])).toUpperCase();
-                }
-            }
-        };
-    }]);
 })();
 'use strict';
 
