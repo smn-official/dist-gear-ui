@@ -1,77 +1,3 @@
-.ui-no-animate {
-  transition: none !important;
-}
-.ui-avatar-cover {
-  position: relative;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-  font-size: 30px;
-  width: 96px;
-  height: 96px;
-  background-position: center;
-  background-size: cover;
-  background-color: #EEE;
-  font-weight: 400;
-  color: rgba(0,0,0,.8);
-}
-
-.ui-avatar-cover.dark {
-  color: white;
-}
-
-.ui-avatar-cover.rounded {
-  border-radius: 8px;
-}
-
-.ui-avatar-cover.rounded {
-  border-radius: 8px;
-}
-
-.ui-avatar-cover.circle {
-  border-radius: 50%;
-}
-
-.ui-avatar-cover button {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-}
-
-.ui-avatar-cover.s18 {
-  width: 18px;
-  height: 18px;
-}
-
-.ui-avatar-cover.s24 {
-  width: 24px;
-  height: 24px;
-}
-
-.ui-avatar-cover.s36 {
-  width: 36px;
-  height: 36px;
-  font-size: 24px;
-}
-
-.ui-avatar-cover img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-}
-
-.ui-avatar-cover.circle img {
-  border-radius: 50%;
-}
 /*============================
     MATERIAL COLORS PALETTE
 ============================*/
@@ -2527,6 +2453,80 @@
   background-color: #FFFFFF;
   color: rgba(0,0,0,.87);
 }
+.ui-no-animate {
+  transition: none !important;
+}
+.ui-avatar-cover {
+  position: relative;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  font-size: 30px;
+  width: 96px;
+  height: 96px;
+  background-position: center;
+  background-size: cover;
+  background-color: #EEE;
+  font-weight: 400;
+  color: rgba(0,0,0,.8);
+}
+
+.ui-avatar-cover.dark {
+  color: white;
+}
+
+.ui-avatar-cover.rounded {
+  border-radius: 8px;
+}
+
+.ui-avatar-cover.rounded {
+  border-radius: 8px;
+}
+
+.ui-avatar-cover.circle {
+  border-radius: 50%;
+}
+
+.ui-avatar-cover button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.ui-avatar-cover.s18 {
+  width: 18px;
+  height: 18px;
+}
+
+.ui-avatar-cover.s24 {
+  width: 24px;
+  height: 24px;
+}
+
+.ui-avatar-cover.s36 {
+  width: 36px;
+  height: 36px;
+  font-size: 24px;
+}
+
+.ui-avatar-cover img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.ui-avatar-cover.circle img {
+  border-radius: 50%;
+}
 .ui-hero-pic {
   position: relative;
   background-position: center;
@@ -3202,113 +3202,6 @@ ui-container.small {
   margin-bottom: 16px;
   color: rgba(0,0,0,0.6);
 }
-.ui-expand.ng-animate {
-  transition: 300ms ease-in-out;
-}
-
-.ui-expand.ng-hide {
-  transition: 600ms ease-in-out, width 300ms ease-in-out 150ms, height 300ms ease-in-out 150ms !important;
-}
-
-.ui-expand > * {
-  transition: 150ms ease-in-out;
-}
-
-.ui-expand.ng-hide-animate > * {
-  opacity: 0;
-  -webkit-transform: translateY(-2px);
-  transform: translateY(-2px);
-  transition: 150ms ease-in-out 300ms;
-}
-
-.ui-expand.ng-hide > * {
-  opacity: 0;
-  transition: 150ms ease-in-out;
-}
-.ui-fade-translate.ng-enter-prepare,
-.ui-fade-translate.ng-enter {
-  opacity: 0;
-  -webkit-transform: translate(0,100px);
-  transform: translate(0,100px);
-  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
-}
-
-.ui-fade-translate.ng-enter-active {
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-}
-
-.ui-animation-container > .ui-fade-translate.ng-enter:not(:only-child) {
-  transition-delay: 300ms;
-}
-
-.ui-fade-translate.ng-leave {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
-}
-
-.ui-fade-translate.ng-leave-active {
-  opacity: 0;
-  -webkit-transform: translate(0,100px);
-  transform: translate(0,100px);
-}
-
-.ui-fade-translate.vertical.ng-enter-prepare,
-.ui-fade-translate.vertical.ng-enter {
-  opacity: 0;
-  -webkit-transform: translate(-100px,0);
-  transform: translate(-100px,0);
-  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
-}
-
-.ui-fade-translate.enter-right.ng-enter-prepare,
-.ui-fade-translate.enter-right.ng-enter {
-  -webkit-transform: translate(100px,0);
-  transform: translate(100px,0);
-}
-
-.ui-fade-translate.vertical.ng-enter-active {
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-}
-
-.ui-fade-translate.vertical.ng-leave {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  opacity: 1;
-  -webkit-transform: translate(0,0);
-  transform: translate(0,0);
-  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
-}
-
-.ui-fade-translate.vertical.ng-leave-active {
-  opacity: 0;
-  -webkit-transform: translate(-100px,0);
-  transform: translate(-100px,0);
-}
-
-.ui-fade-translate.leave-right.ng-leave-active {
-  -webkit-transform: translate(100px,0);
-  transform: translate(100px,0);
-}
-
-.ui-fade-translate.ng-enter-prepare .ui-float-container button.float,
-.ui-fade-translate.ng-enter .ui-float-container button.float,
-.ui-fade-translate.ng-leave .ui-float-container button.float {
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  transition: none;
-}
 ui-color-picker {
   width: 48px;
   display: block;
@@ -3478,6 +3371,113 @@ ui-color-picker .switch-color-preview.round-rectangle::before {
 
 ui-color-picker .switch-color-preview.round-rectangle.no-color::after {
   height: 150%;
+}
+.ui-fade-translate.ng-enter-prepare,
+.ui-fade-translate.ng-enter {
+  opacity: 0;
+  -webkit-transform: translate(0,100px);
+  transform: translate(0,100px);
+  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
+}
+
+.ui-fade-translate.ng-enter-active {
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+}
+
+.ui-animation-container > .ui-fade-translate.ng-enter:not(:only-child) {
+  transition-delay: 300ms;
+}
+
+.ui-fade-translate.ng-leave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
+}
+
+.ui-fade-translate.ng-leave-active {
+  opacity: 0;
+  -webkit-transform: translate(0,100px);
+  transform: translate(0,100px);
+}
+
+.ui-fade-translate.vertical.ng-enter-prepare,
+.ui-fade-translate.vertical.ng-enter {
+  opacity: 0;
+  -webkit-transform: translate(-100px,0);
+  transform: translate(-100px,0);
+  transition: 300ms cubic-bezier(0.18, 0.79, 0.7, 0.97);
+}
+
+.ui-fade-translate.enter-right.ng-enter-prepare,
+.ui-fade-translate.enter-right.ng-enter {
+  -webkit-transform: translate(100px,0);
+  transform: translate(100px,0);
+}
+
+.ui-fade-translate.vertical.ng-enter-active {
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+}
+
+.ui-fade-translate.vertical.ng-leave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  -webkit-transform: translate(0,0);
+  transform: translate(0,0);
+  transition: 300ms cubic-bezier(0.34, 0.07, 0.9, 0.53);
+}
+
+.ui-fade-translate.vertical.ng-leave-active {
+  opacity: 0;
+  -webkit-transform: translate(-100px,0);
+  transform: translate(-100px,0);
+}
+
+.ui-fade-translate.leave-right.ng-leave-active {
+  -webkit-transform: translate(100px,0);
+  transform: translate(100px,0);
+}
+
+.ui-fade-translate.ng-enter-prepare .ui-float-container button.float,
+.ui-fade-translate.ng-enter .ui-float-container button.float,
+.ui-fade-translate.ng-leave .ui-float-container button.float {
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  transition: none;
+}
+.ui-expand.ng-animate {
+  transition: 300ms ease-in-out;
+}
+
+.ui-expand.ng-hide {
+  transition: 600ms ease-in-out, width 300ms ease-in-out 150ms, height 300ms ease-in-out 150ms !important;
+}
+
+.ui-expand > * {
+  transition: 150ms ease-in-out;
+}
+
+.ui-expand.ng-hide-animate > * {
+  opacity: 0;
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+  transition: 150ms ease-in-out 300ms;
+}
+
+.ui-expand.ng-hide > * {
+  opacity: 0;
+  transition: 150ms ease-in-out;
 }
 ui-calendar {
   display: -webkit-inline-box;
