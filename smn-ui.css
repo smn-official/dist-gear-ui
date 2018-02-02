@@ -4854,99 +4854,6 @@ ui-slide > .stay-left {
   -webkit-transform: translate(-100%);
   transform: translate(-100%);
 }
-ui-snack-container {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 0;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-pack: end;
-  justify-content: flex-end;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  flex-direction: column;
-  z-index: 2000;
-}
-
-ui-snack-bar {
-  margin: 0 auto;
-  -webkit-box-flex: 0;
-  flex: 0 0 auto;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  background-color: #323232;
-  color: white;
-  padding: 14px 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  border-radius: 2px;
-  min-width: 288px;
-  max-width: 568px;
-  transition: -webkit-transform 200ms ease-in-out;
-  transition: transform 200ms ease-in-out;
-  transition: transform 200ms ease-in-out, -webkit-transform 200ms ease-in-out;
-}
-
-@media (max-width: 568px) {
-  ui-snack-bar {
-    min-width: auto;
-    max-width: auto;
-    width: 100%;
-    border-radius: 0;
-  }
-}
-
-ui-snack-bar + ui-snack-bar {
-  margin-top: 10px;
-}
-
-ui-snack-bar .text {
-  -webkit-box-flex: 1;
-  flex: 1;
-  font-size: 14px;
-  font-weight: 300;
-}
-
-ui-snack-bar .text:not(:last-child) {
-  padding-right: 48px;
-}
-
-ui-snack-bar button {
-  margin: -8px;
-  padding: 8px;
-  height: auto;
-  font-weight: 500;
-  color: #2196F3;
-}
-
-ui-snack-bar.ng-enter {
-  -webkit-transform: translateY(100%);
-  transform: translateY(100%);
-}
-
-ui-snack-bar.ng-enter-active {
-  -webkit-transform: translateY(0);
-  transform: translateY(0);
-}
-
-ui-snack-bar.ng-leave {
-  -webkit-transform: translateY(0);
-  transform: translateY(0);
-}
-
-ui-snack-bar.ng-leave-active {
-  -webkit-transform: translateY(100%);
-  transform: translateY(100%);
-}
-
-ui-snack-bar + ui-snack-bar {
-  position: absolute;
-  transition-delay: 200ms;
-  visibility: hidden;
-}
 ui-spinner {
   display: inline-block;
   width: 24px;
@@ -5093,6 +5000,99 @@ ui-spinner.light path {
   100% {
     stroke: #666;
   }
+}
+ui-snack-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: end;
+  justify-content: flex-end;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  z-index: 2000;
+}
+
+ui-snack-bar {
+  margin: 0 auto;
+  -webkit-box-flex: 0;
+  flex: 0 0 auto;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  background-color: #323232;
+  color: white;
+  padding: 14px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  border-radius: 2px;
+  min-width: 288px;
+  max-width: 568px;
+  transition: -webkit-transform 200ms ease-in-out;
+  transition: transform 200ms ease-in-out;
+  transition: transform 200ms ease-in-out, -webkit-transform 200ms ease-in-out;
+}
+
+@media (max-width: 568px) {
+  ui-snack-bar {
+    min-width: auto;
+    max-width: auto;
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+ui-snack-bar + ui-snack-bar {
+  margin-top: 10px;
+}
+
+ui-snack-bar .text {
+  -webkit-box-flex: 1;
+  flex: 1;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+ui-snack-bar .text:not(:last-child) {
+  padding-right: 48px;
+}
+
+ui-snack-bar button {
+  margin: -8px;
+  padding: 8px;
+  height: auto;
+  font-weight: 500;
+  color: #2196F3;
+}
+
+ui-snack-bar.ng-enter {
+  -webkit-transform: translateY(100%);
+  transform: translateY(100%);
+}
+
+ui-snack-bar.ng-enter-active {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+
+ui-snack-bar.ng-leave {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+
+ui-snack-bar.ng-leave-active {
+  -webkit-transform: translateY(100%);
+  transform: translateY(100%);
+}
+
+ui-snack-bar + ui-snack-bar {
+  position: absolute;
+  transition-delay: 200ms;
+  visibility: hidden;
 }
 .ui-table {
   overflow: auto;
