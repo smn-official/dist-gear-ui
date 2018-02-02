@@ -204,6 +204,60 @@
 (function () {
     'use strict';
 
+    uiMaskPhone.$inject = ["uiPhoneFilter"];
+    angular.module('smn-ui').directive('uiMaskPhone', uiMaskPhone);
+
+    function uiMaskPhone(uiPhoneFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = uiPhoneFilter(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                if (viewValue.length === 14 || viewValue.length === 15) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                return uiPhoneFilter(value);
+            });
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiPhone', uiPhone);
+
+    function uiPhone() {
+        return uiPhoneFilter;
+
+        ////////////////
+
+        function uiPhoneFilter(phone) {
+            if (!phone) return;
+            phone = phone.toString().replace(/[^0-9]+/g, '');
+            if (phone.length > 0) phone = '(' + phone;
+            if (phone.length > 3) phone = phone.substring(0, 3) + ') ' + phone.substring(3);
+            if (phone.length > 9 && phone.length < 14) phone = phone.substring(0, 9) + '-' + phone.substring(9);else if (phone.length > 13) phone = phone.substring(0, 10) + '-' + phone.substring(10);
+            if (phone.length > 15) phone = phone.substring(0, 15);
+            return phone;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     uiMaskPhonenumber.$inject = ["uiPhonenumberFilter", "$timeout"];
     angular.module('smn-ui').directive('uiMaskPhonenumber', uiMaskPhonenumber);
 
@@ -303,60 +357,6 @@
             if (phonenumber.length > 4 && phonenumber.length < 9) phonenumber = phonenumber.substring(0, 4) + '-' + phonenumber.substring(4);else if (phonenumber.length > 8) phonenumber = phonenumber.substring(0, 5) + '-' + phonenumber.substring(5);
             if (phonenumber.length > 10) phonenumber = phonenumber.substring(0, 10);
             return phonenumber;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMaskPhone.$inject = ["uiPhoneFilter"];
-    angular.module('smn-ui').directive('uiMaskPhone', uiMaskPhone);
-
-    function uiMaskPhone(uiPhoneFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = uiPhoneFilter(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                if (viewValue.length === 14 || viewValue.length === 15) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                return uiPhoneFilter(value);
-            });
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiPhone', uiPhone);
-
-    function uiPhone() {
-        return uiPhoneFilter;
-
-        ////////////////
-
-        function uiPhoneFilter(phone) {
-            if (!phone) return;
-            phone = phone.toString().replace(/[^0-9]+/g, '');
-            if (phone.length > 0) phone = '(' + phone;
-            if (phone.length > 3) phone = phone.substring(0, 3) + ') ' + phone.substring(3);
-            if (phone.length > 9 && phone.length < 14) phone = phone.substring(0, 9) + '-' + phone.substring(9);else if (phone.length > 13) phone = phone.substring(0, 10) + '-' + phone.substring(10);
-            if (phone.length > 15) phone = phone.substring(0, 15);
-            return phone;
         }
     }
 })();
@@ -2755,6 +2755,25 @@
 (function () {
 	'use strict';
 
+	angular.module('smn-ui').component('uiSpinner', {
+		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
+		controller: uiSpinnerController
+	});
+
+	uiSpinnerController.$inject = ['$element'];
+	function uiSpinnerController($element) {
+		var $ctrl = this;
+
+		$ctrl.$onInit = function () {};
+		$ctrl.$onChanges = function (changesObj) {};
+		$ctrl.$onDestory = function () {};
+	}
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
 	angular.module('smn-ui').provider('uiSnack', uiSnack);
 
 	uiSnack.$inject = [];
@@ -2878,25 +2897,6 @@
 		return directive;
 
 		function link(scope, element, attrs) {}
-	}
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').component('uiSpinner', {
-		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
-		controller: uiSpinnerController
-	});
-
-	uiSpinnerController.$inject = ['$element'];
-	function uiSpinnerController($element) {
-		var $ctrl = this;
-
-		$ctrl.$onInit = function () {};
-		$ctrl.$onChanges = function (changesObj) {};
-		$ctrl.$onDestory = function () {};
 	}
 })();
 'use strict';
@@ -3243,10 +3243,6 @@
 })();
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 (function () {
 	'use strict';
 
@@ -3266,7 +3262,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 				'change': '=',
 				'click': '='
 			},
-			template:'<ui-input-container><input autocomplete="off" placeholder="{{placeholderList}}" ng-change="selected()" list="{{idList}}" ng-model="choosen"><datalist id="{{idList}}"><option ng-repeat="opt in list">{{opt[config.option]}}</option></datalist><label>{{labelList}}</label></ui-input-container>',
+			template: '<ui-input-container><input autocomplete="off" placeholder="{{placeholderList}}" ng-change="selected()" list="{{idList}}" ng-model="choosen"><datalist id="{{idList}}"><option ng-repeat="opt in list">{{opt[config.option]}}</option></datalist><label>{{labelList}}</label></ui-input-container>',
 			link: function link(scope, element, attrs, ngModel) {
 				scope.config = angular.extend(scope.config || {}, {
 					display: null,
@@ -3282,8 +3278,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 				scope.selected = function () {
 					var itemSelected = scope.list.filter(function (obj) {
-						return obj.nome == scope.choosen;
+						return obj[scope.config.option] == scope.choosen;
 					})[0];
+
 					var rtn = !scope.attrList ? itemSelected || null : itemSelected ? itemSelected[scope.attrList] : null;
 					ngModel.$setViewValue(rtn);
 					scope.change && scope.change(rtn);
