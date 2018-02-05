@@ -311,60 +311,6 @@
 (function () {
     'use strict';
 
-    uiMaskPhone.$inject = ["uiPhoneFilter"];
-    angular.module('smn-ui').directive('uiMaskPhone', uiMaskPhone);
-
-    function uiMaskPhone(uiPhoneFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = uiPhoneFilter(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                if (viewValue.length === 14 || viewValue.length === 15) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                return uiPhoneFilter(value);
-            });
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiPhone', uiPhone);
-
-    function uiPhone() {
-        return uiPhoneFilter;
-
-        ////////////////
-
-        function uiPhoneFilter(phone) {
-            if (!phone) return;
-            phone = phone.toString().replace(/[^0-9]+/g, '');
-            if (phone.length > 0) phone = '(' + phone;
-            if (phone.length > 3) phone = phone.substring(0, 3) + ') ' + phone.substring(3);
-            if (phone.length > 9 && phone.length < 14) phone = phone.substring(0, 9) + '-' + phone.substring(9);else if (phone.length > 13) phone = phone.substring(0, 10) + '-' + phone.substring(10);
-            if (phone.length > 15) phone = phone.substring(0, 15);
-            return phone;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     uiMaskPercentage.$inject = ["uiPercentageFilter"];
     angular.module('smn-ui').directive('uiMaskPercentage', uiMaskPercentage);
 
@@ -433,6 +379,60 @@
             if (!percentage || percentage == "%") return '';
 
             return percentage;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiMaskPhone.$inject = ["uiPhoneFilter"];
+    angular.module('smn-ui').directive('uiMaskPhone', uiMaskPhone);
+
+    function uiMaskPhone(uiPhoneFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = uiPhoneFilter(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                if (viewValue.length === 14 || viewValue.length === 15) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                return uiPhoneFilter(value);
+            });
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiPhone', uiPhone);
+
+    function uiPhone() {
+        return uiPhoneFilter;
+
+        ////////////////
+
+        function uiPhoneFilter(phone) {
+            if (!phone) return;
+            phone = phone.toString().replace(/[^0-9]+/g, '');
+            if (phone.length > 0) phone = '(' + phone;
+            if (phone.length > 3) phone = phone.substring(0, 3) + ') ' + phone.substring(3);
+            if (phone.length > 9 && phone.length < 14) phone = phone.substring(0, 9) + '-' + phone.substring(9);else if (phone.length > 13) phone = phone.substring(0, 10) + '-' + phone.substring(10);
+            if (phone.length > 15) phone = phone.substring(0, 15);
+            return phone;
         }
     }
 })();
@@ -1497,6 +1497,57 @@
 'use strict';
 
 (function () {
+	'use strict';
+
+	angular.module('smn-ui').animation('.ui-hamburger-icon', hamburgerAnimation);
+
+	hamburgerAnimation.$inject = ['$animateCss', '$timeout'];
+
+	function hamburgerAnimation($animateCss, $timeout) {
+		return {
+			addClass: function addClass(element, className, doneFn) {
+				if (className !== 'back') return;
+				if (typeof element[0].addClassAnimationRunning === 'undefined') element[0].addClassAnimationRunning = 0;
+				element[0].addClassAnimationRunning++;
+				$animateCss(element, {
+					to: {
+						transform: 'rotate(180deg)'
+					}
+				}).start().done(function () {
+					if (element.is('.half')) element.removeClass('half');else element.addClass('half');
+					element[0].addClassAnimationRunning--;
+					doneFn();
+				});
+			},
+			removeClass: function removeClass(element, className, doneFn) {
+				if (className !== 'back') return;
+				if (typeof element[0].removeClassAnimationRunning === 'undefined') element[0].removeClassAnimationRunning = 0;
+				element[0].removeClassAnimationRunning++;
+				$animateCss(element, {
+					to: {
+						transform: 'rotate(' + (element[0].addClassAnimationRunning && element[0].removeClassAnimationRunning % 2 !== 0 ? 0 : 360) + 'deg)'
+					}
+				}).start().done(function () {
+					if (element.is('.half')) {
+						element.removeClass('half');
+						if (!element[0].addClassAnimationRunning) {
+							element.css('transition', '0s');
+							element.css('transform', '');
+							$timeout(function () {
+								element.css('transition', '');
+							});
+						}
+					} else element.addClass('half');
+					element[0].removeClassAnimationRunning--;
+					doneFn();
+				});
+			}
+		};
+	}
+})();
+'use strict';
+
+(function () {
     'use strict';
 
     angular.module('smn-ui').filter('uiMinute', uiMinute);
@@ -1547,57 +1598,6 @@
             }
         }
     }
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').animation('.ui-hamburger-icon', hamburgerAnimation);
-
-	hamburgerAnimation.$inject = ['$animateCss', '$timeout'];
-
-	function hamburgerAnimation($animateCss, $timeout) {
-		return {
-			addClass: function addClass(element, className, doneFn) {
-				if (className !== 'back') return;
-				if (typeof element[0].addClassAnimationRunning === 'undefined') element[0].addClassAnimationRunning = 0;
-				element[0].addClassAnimationRunning++;
-				$animateCss(element, {
-					to: {
-						transform: 'rotate(180deg)'
-					}
-				}).start().done(function () {
-					if (element.is('.half')) element.removeClass('half');else element.addClass('half');
-					element[0].addClassAnimationRunning--;
-					doneFn();
-				});
-			},
-			removeClass: function removeClass(element, className, doneFn) {
-				if (className !== 'back') return;
-				if (typeof element[0].removeClassAnimationRunning === 'undefined') element[0].removeClassAnimationRunning = 0;
-				element[0].removeClassAnimationRunning++;
-				$animateCss(element, {
-					to: {
-						transform: 'rotate(' + (element[0].addClassAnimationRunning && element[0].removeClassAnimationRunning % 2 !== 0 ? 0 : 360) + 'deg)'
-					}
-				}).start().done(function () {
-					if (element.is('.half')) {
-						element.removeClass('half');
-						if (!element[0].addClassAnimationRunning) {
-							element.css('transition', '0s');
-							element.css('transform', '');
-							$timeout(function () {
-								element.css('transition', '');
-							});
-						}
-					} else element.addClass('half');
-					element[0].removeClassAnimationRunning--;
-					doneFn();
-				});
-			}
-		};
-	}
 })();
 'use strict';
 
@@ -2334,6 +2334,38 @@
 'use strict';
 
 (function () {
+	'use strict';
+
+	angular.module('smn-ui').factory('uiWindow', uiWindow);
+
+	uiWindow.$inject = ['$window', '$rootScope'];
+
+	function uiWindow($window, $rootScope) {
+		var service = {};
+
+		angular.element($window).bind('scroll', function () {
+			$rootScope.$apply(getWindowScroll);
+		});
+
+		angular.element($window).bind('resize', function () {
+			$rootScope.$apply(getWindowScroll);
+		});
+
+		function getWindowScroll() {
+			service.scrollX = $window.scrollX;
+			service.scrollY = $window.scrollY;
+			service.innerWidth = $window.innerWidth;
+			service.innerHeight = $window.innerHeight;
+		}
+
+		getWindowScroll();
+
+		return service;
+	}
+})();
+'use strict';
+
+(function () {
     'use strict';
 
     angular.module('smn-ui').filter('uiUnaccent', uiUnaccent);
@@ -2409,38 +2441,6 @@
             return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
         }
     }
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').factory('uiWindow', uiWindow);
-
-	uiWindow.$inject = ['$window', '$rootScope'];
-
-	function uiWindow($window, $rootScope) {
-		var service = {};
-
-		angular.element($window).bind('scroll', function () {
-			$rootScope.$apply(getWindowScroll);
-		});
-
-		angular.element($window).bind('resize', function () {
-			$rootScope.$apply(getWindowScroll);
-		});
-
-		function getWindowScroll() {
-			service.scrollX = $window.scrollX;
-			service.scrollY = $window.scrollY;
-			service.innerWidth = $window.innerWidth;
-			service.innerHeight = $window.innerHeight;
-		}
-
-		getWindowScroll();
-
-		return service;
-	}
 })();
 'use strict';
 
@@ -2754,6 +2754,25 @@
 (function () {
 	'use strict';
 
+	angular.module('smn-ui').component('uiSpinner', {
+		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
+		controller: uiSpinnerController
+	});
+
+	uiSpinnerController.$inject = ['$element'];
+	function uiSpinnerController($element) {
+		var $ctrl = this;
+
+		$ctrl.$onInit = function () {};
+		$ctrl.$onChanges = function (changesObj) {};
+		$ctrl.$onDestory = function () {};
+	}
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
 	angular.module('smn-ui').provider('uiSnack', uiSnack);
 
 	uiSnack.$inject = [];
@@ -2877,25 +2896,6 @@
 		return directive;
 
 		function link(scope, element, attrs) {}
-	}
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').component('uiSpinner', {
-		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
-		controller: uiSpinnerController
-	});
-
-	uiSpinnerController.$inject = ['$element'];
-	function uiSpinnerController($element) {
-		var $ctrl = this;
-
-		$ctrl.$onInit = function () {};
-		$ctrl.$onChanges = function (changesObj) {};
-		$ctrl.$onDestory = function () {};
 	}
 })();
 'use strict';
@@ -3242,6 +3242,8 @@
 })();
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 (function () {
 	'use strict';
 
@@ -3272,7 +3274,7 @@
 				scope.$watch('list', function () {
 					var _ref;
 
-					if (scope.list && scope.itemDefault) scope.list.splice(0, 0, _typeof(scope.list[0]) == 'object' ? (_ref = {}, _defineProperty(_ref, scope.config.option, scope.itemDefault), _defineProperty(_ref, scope.config.value, null), _ref) : scope.itemDefault);
+					if (scope.list && scope.itemDefault) scope.list.splice(0, 0, angular.isObject(scope.list[0]) ? (_ref = {}, _defineProperty(_ref, scope.config.option, scope.itemDefault), _defineProperty(_ref, scope.config.value, null), _ref) : scope.itemDefault);
 				});
 
 				scope.selected = function () {
