@@ -3479,6 +3479,95 @@ ui-color-picker .switch-color-preview.round-rectangle::before {
 ui-color-picker .switch-color-preview.round-rectangle.no-color::after {
   height: 150%;
 }
+ui-card {
+  display: block;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.2);
+  background-color: #FFF;
+  max-width: 100%;
+  border-radius: 2px;
+  transition: 200ms ease-in-out;
+}
+
+ui-card.no-space {
+  margin: 0;
+}
+
+ui-card.no-radius {
+  border-radius: 0;
+}
+
+ui-card.pointer {
+  cursor: pointer;
+}
+
+ui-card.hover:hover {
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.2);
+}
+
+ui-card-content {
+  display: block;
+  padding: 16px;
+}
+
+ui-card-title {
+  display: block;
+  font-size: 20px;
+  padding: 16px 16px 0;
+}
+
+.if-slide.ng-enter {
+  -webkit-transform: translateX(-100vw);
+  transform: translateX(-100vw);
+  max-height: 0;
+  transition: margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
+  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
+  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
+}
+
+.if-slide.ng-enter:not(.ng-enter-active) {
+  margin: 0 !important;
+}
+
+.if-slide.ng-enter-active {
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  max-height: 100vw;
+}
+
+.if-slide.ng-leave {
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  max-height: 100vw;
+  transition: margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
+  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5);
+  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
+}
+
+.if-slide.ng-leave-active {
+  -webkit-transform: translateX(100vw);
+  transform: translateX(100vw);
+  margin: 0 !important;
+  max-height: 0;
+}
+
+.if-slide.enter-right.ng-enter {
+  -webkit-transform: translateX(100vw);
+  transform: translateX(100vw);
+}
+
+.if-slide.enter-right.ng-enter-active {
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+}
+
+.if-slide.leave-left.ng-leave {
+  /*transform: translateX(0);*/
+}
+
+.if-slide.leave-left.ng-leave-active {
+  -webkit-transform: translateX(-100vw);
+  transform: translateX(-100vw);
+}
 ui-calendar {
   display: -webkit-inline-box;
   display: inline-flex;
@@ -3893,95 +3982,6 @@ ui-menu .ui-menu-wrapper {
 ui-menu .title {
   color: rgba(0,0,0,0.7);
   padding: 10px;
-}
-ui-card {
-  display: block;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.2);
-  background-color: #FFF;
-  max-width: 100%;
-  border-radius: 2px;
-  transition: 200ms ease-in-out;
-}
-
-ui-card.no-space {
-  margin: 0;
-}
-
-ui-card.no-radius {
-  border-radius: 0;
-}
-
-ui-card.pointer {
-  cursor: pointer;
-}
-
-ui-card.hover:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.2);
-}
-
-ui-card-content {
-  display: block;
-  padding: 16px;
-}
-
-ui-card-title {
-  display: block;
-  font-size: 20px;
-  padding: 16px 16px 0;
-}
-
-.if-slide.ng-enter {
-  -webkit-transform: translateX(-100vw);
-  transform: translateX(-100vw);
-  max-height: 0;
-  transition: margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
-  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
-  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
-}
-
-.if-slide.ng-enter:not(.ng-enter-active) {
-  margin: 0 !important;
-}
-
-.if-slide.ng-enter-active {
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
-  max-height: 100vw;
-}
-
-.if-slide.ng-leave {
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
-  max-height: 100vw;
-  transition: margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
-  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5);
-  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
-}
-
-.if-slide.ng-leave-active {
-  -webkit-transform: translateX(100vw);
-  transform: translateX(100vw);
-  margin: 0 !important;
-  max-height: 0;
-}
-
-.if-slide.enter-right.ng-enter {
-  -webkit-transform: translateX(100vw);
-  transform: translateX(100vw);
-}
-
-.if-slide.enter-right.ng-enter-active {
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
-}
-
-.if-slide.leave-left.ng-leave {
-  /*transform: translateX(0);*/
-}
-
-.if-slide.leave-left.ng-leave-active {
-  -webkit-transform: translateX(-100vw);
-  transform: translateX(-100vw);
 }
 ui-floating-card {
   display: -webkit-box;
@@ -7663,7 +7663,6 @@ ui-menu-item div.item-wrap > div {
 ui-menu-item div.item-wrap > div > i {
   font-size: 22px;
   color: #E53935;
-  transition: 200ms ease;
 }
 ui-menu-list {
   position: relative;
