@@ -173,7 +173,7 @@
 			require: '^uiMainMenu',
 			link: link,
 			restrict: 'E',
-			template:'<div class="item-wrap"><a ng-href="{{item[config.href] || \'\'}}" ng-class="{\'has-submenu\': item[config.submenu]}" ng-click="item[config.submenu] ? openMenu() : (item[config.href] && menuClick())"><i class="material-icons option-icon" ng-class="{\'arrow-drop\': item[config.submenu]}" ng-if="item[config.submenu] || item[config.icon]">{{item[config.icon] || \'arrow_drop_down\'}}</i> {{item[config.name]}}</a></div>',
+			template:'<div class="item-wrap"><a ng-href="{{item[config.href] || \'\'}}" ng-class="{\'has-submenu\': item[config.submenu]}" ng-click="item[config.submenu] ? openMenu() : (item[config.href] && menuClick())"><i class="material-icons option-icon" ng-class="{\'arrow-drop\': item[config.submenu]}" ng-if="item[config.submenu] || item[config.icon]">{{item[config.icon] || \'arrow_drop_down\'}}</i> {{item[config.name]}}</a><div ng-if="config.fav && item[config.href] && !item.denied"><i class="material-icons" ng-if="!item[config.fav.attr]" ng-click="config.fav.active(item)">{{config.fav.icon || \'favorite_border\'}}</i> <i class="material-icons" ng-if="item[config.fav.attr]" ng-click="config.fav.inative(item)" style="color:#E53935" ng-style="{color: config.fav.activeColor}">{{config.fav.iconActive || \'favorite\'}}</i></div></div>',
 			scope: {
 				'item': '=',
 				'list': '=',
@@ -311,6 +311,60 @@
 (function () {
     'use strict';
 
+    uiMaskPhone.$inject = ["uiPhoneFilter"];
+    angular.module('smn-ui').directive('uiMaskPhone', uiMaskPhone);
+
+    function uiMaskPhone(uiPhoneFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = uiPhoneFilter(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                if (viewValue.length === 14 || viewValue.length === 15) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                return uiPhoneFilter(value);
+            });
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiPhone', uiPhone);
+
+    function uiPhone() {
+        return uiPhoneFilter;
+
+        ////////////////
+
+        function uiPhoneFilter(phone) {
+            if (!phone) return;
+            phone = phone.toString().replace(/[^0-9]+/g, '');
+            if (phone.length > 0) phone = '(' + phone;
+            if (phone.length > 3) phone = phone.substring(0, 3) + ') ' + phone.substring(3);
+            if (phone.length > 9 && phone.length < 14) phone = phone.substring(0, 9) + '-' + phone.substring(9);else if (phone.length > 13) phone = phone.substring(0, 10) + '-' + phone.substring(10);
+            if (phone.length > 15) phone = phone.substring(0, 15);
+            return phone;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     uiMaskPercentage.$inject = ["uiPercentageFilter"];
     angular.module('smn-ui').directive('uiMaskPercentage', uiMaskPercentage);
 
@@ -379,60 +433,6 @@
             if (!percentage || percentage == "%") return '';
 
             return percentage;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMaskPhone.$inject = ["uiPhoneFilter"];
-    angular.module('smn-ui').directive('uiMaskPhone', uiMaskPhone);
-
-    function uiMaskPhone(uiPhoneFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = uiPhoneFilter(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                if (viewValue.length === 14 || viewValue.length === 15) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                return uiPhoneFilter(value);
-            });
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiPhone', uiPhone);
-
-    function uiPhone() {
-        return uiPhoneFilter;
-
-        ////////////////
-
-        function uiPhoneFilter(phone) {
-            if (!phone) return;
-            phone = phone.toString().replace(/[^0-9]+/g, '');
-            if (phone.length > 0) phone = '(' + phone;
-            if (phone.length > 3) phone = phone.substring(0, 3) + ') ' + phone.substring(3);
-            if (phone.length > 9 && phone.length < 14) phone = phone.substring(0, 9) + '-' + phone.substring(9);else if (phone.length > 13) phone = phone.substring(0, 10) + '-' + phone.substring(10);
-            if (phone.length > 15) phone = phone.substring(0, 15);
-            return phone;
         }
     }
 })();
@@ -1030,6 +1030,134 @@
 (function () {
     'use strict';
 
+    uiDatepicker.$inject = ["$compile", "$timeout", "$animate", "$interpolate"];
+    angular.module('smn-ui').directive('uiDatepicker', uiDatepicker);
+
+    function uiDatepicker($compile, $timeout, $animate, $interpolate) {
+        var directive = {
+            require: 'ngModel',
+            link: link,
+            restrict: 'A',
+            scope: {
+                ngModel: '=',
+                uiDateFormat: '@?',
+                uiDatepicker: '@?',
+                uiSelect: '&?',
+                uiMinDate: '=?',
+                uiMaxDate: '=?',
+                ngReadonly: '=?',
+                uiViewDate: '=?'
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            var picker,
+                mask,
+                pickerGroup,
+                fromEnter,
+                toEnter,
+                target = scope.uiDatepicker ? angular.element(scope.uiDatepicker) : element;
+
+            element.on(attrs.uiPickerEvent || 'focus', function (e) {
+                renderPicker(target);
+            });
+
+            scope.closePicker = closePicker;
+            scope.select = select;
+
+            function renderPicker(target) {
+                pickerGroup = $compile('<ui-background-mask class="ui-picker-mask" ng-mousedown="closePicker($event)"></ui-background-mask>' + '<ui-calendar class="ui-picker" ' + 'tabindex="0" ' + 'ui-select="select($date)" ' + 'ui-cancel="closePicker()" ' + 'ui-view-date="uiViewDate" ' + 'ui-min-date="uiMinDate" ' + 'ui-max-date="uiMaxDate" ' + 'ui-view-date="ngModel" ' + ('uiInitOnSelected' in attrs ? 'ui-init-on-selected ' : '') + 'ng-model="ngModel"></ui-calendar>')(scope);
+                var inputOffset = target.offset(),
+                    padding = 16;
+
+                angular.element('body').append(pickerGroup);
+                mask = angular.element(pickerGroup[0]);
+                picker = angular.element(pickerGroup[1]);
+
+                $timeout(function () {
+                    var pickerSize = {
+                        height: picker[0].scrollHeight,
+                        width: picker[0].clientWidth
+                    };
+
+                    var correctionMatrix = {
+                        x: 0,
+                        y: 0
+                    };
+
+                    var pickerHorizontalCoveringArea = inputOffset.left + picker[0].clientWidth + padding + (!scope.ngReadonly ? target[0].clientHeight : 0),
+                        pickerVerticalCoveringArea = inputOffset.top + picker[0].clientHeight + padding + (!scope.ngReadonly ? target[0].clientHeight : 0);
+
+                    if (pickerHorizontalCoveringArea > window.innerWidth + document.body.scrollTop) correctionMatrix.x = window.innerWidth + document.body.scrollTop - pickerHorizontalCoveringArea;
+                    if (pickerVerticalCoveringArea > window.innerHeight + document.body.scrollTop) correctionMatrix.y = window.innerHeight + document.body.scrollTop - pickerVerticalCoveringArea;
+
+                    fromEnter = {
+                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
+                        left: inputOffset.left,
+                        opacity: 0,
+                        transform: 'scale(0) translate(0px, 0px)'
+                    };
+                    toEnter = {
+                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
+                        left: inputOffset.left,
+                        opacity: 1,
+                        transform: 'scale(1) ' + $interpolate('translate({{x}}px, {{y}}px)')({ x: correctionMatrix.x, y: correctionMatrix.y })
+                    };
+                    $animate.enter(picker, document.body, angular.element('body > *:last-child'), {
+                        from: fromEnter,
+                        to: toEnter
+                    }).then(function () {
+                        picker.css({ height: '', width: '' });
+                        picker.find('.label').focus();
+                    });
+                });
+
+                var checkTimeout;
+                picker.on('focus', 'button', function (e) {
+                    $timeout.cancel(checkTimeout);
+                });
+                picker.on('mousedown click mouseup', function (e) {
+                    $timeout.cancel(checkTimeout);
+                });
+                picker.on('keydown', function (e) {
+                    if (e.keyCode === 27) scope.closePicker();
+                });
+                picker.on('focusout', 'button', function (e) {
+                    checkTimeout = $timeout(function () {
+                        scope.closePicker();
+                        element.focus();
+                    });
+                });
+            }
+
+            function select($date) {
+                scope.uiSelect && scope.uiSelect({ $date: $date });
+                closePicker();
+            };
+
+            function closePicker(event) {
+                $animate.leave(mask);
+                toEnter.height = picker[0].scrollHeight;
+                $animate.leave(picker, {
+                    from: toEnter,
+                    to: fromEnter
+                }).then(function () {
+                    element.focus();
+                });
+                if (event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            };
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     angular.module('smn-ui').directive('uiInputFile', uiInputFile);
 
     uiInputFile.$inject = ['$compile'];
@@ -1192,134 +1320,6 @@
                 };
                 reader.readAsDataURL(file);
             }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiDatepicker.$inject = ["$compile", "$timeout", "$animate", "$interpolate"];
-    angular.module('smn-ui').directive('uiDatepicker', uiDatepicker);
-
-    function uiDatepicker($compile, $timeout, $animate, $interpolate) {
-        var directive = {
-            require: 'ngModel',
-            link: link,
-            restrict: 'A',
-            scope: {
-                ngModel: '=',
-                uiDateFormat: '@?',
-                uiDatepicker: '@?',
-                uiSelect: '&?',
-                uiMinDate: '=?',
-                uiMaxDate: '=?',
-                ngReadonly: '=?',
-                uiViewDate: '=?'
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            var picker,
-                mask,
-                pickerGroup,
-                fromEnter,
-                toEnter,
-                target = scope.uiDatepicker ? angular.element(scope.uiDatepicker) : element;
-
-            element.on(attrs.uiPickerEvent || 'focus', function (e) {
-                renderPicker(target);
-            });
-
-            scope.closePicker = closePicker;
-            scope.select = select;
-
-            function renderPicker(target) {
-                pickerGroup = $compile('<ui-background-mask class="ui-picker-mask" ng-mousedown="closePicker($event)"></ui-background-mask>' + '<ui-calendar class="ui-picker" ' + 'tabindex="0" ' + 'ui-select="select($date)" ' + 'ui-cancel="closePicker()" ' + 'ui-view-date="uiViewDate" ' + 'ui-min-date="uiMinDate" ' + 'ui-max-date="uiMaxDate" ' + 'ui-view-date="ngModel" ' + ('uiInitOnSelected' in attrs ? 'ui-init-on-selected ' : '') + 'ng-model="ngModel"></ui-calendar>')(scope);
-                var inputOffset = target.offset(),
-                    padding = 16;
-
-                angular.element('body').append(pickerGroup);
-                mask = angular.element(pickerGroup[0]);
-                picker = angular.element(pickerGroup[1]);
-
-                $timeout(function () {
-                    var pickerSize = {
-                        height: picker[0].scrollHeight,
-                        width: picker[0].clientWidth
-                    };
-
-                    var correctionMatrix = {
-                        x: 0,
-                        y: 0
-                    };
-
-                    var pickerHorizontalCoveringArea = inputOffset.left + picker[0].clientWidth + padding + (!scope.ngReadonly ? target[0].clientHeight : 0),
-                        pickerVerticalCoveringArea = inputOffset.top + picker[0].clientHeight + padding + (!scope.ngReadonly ? target[0].clientHeight : 0);
-
-                    if (pickerHorizontalCoveringArea > window.innerWidth + document.body.scrollTop) correctionMatrix.x = window.innerWidth + document.body.scrollTop - pickerHorizontalCoveringArea;
-                    if (pickerVerticalCoveringArea > window.innerHeight + document.body.scrollTop) correctionMatrix.y = window.innerHeight + document.body.scrollTop - pickerVerticalCoveringArea;
-
-                    fromEnter = {
-                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
-                        left: inputOffset.left,
-                        opacity: 0,
-                        transform: 'scale(0) translate(0px, 0px)'
-                    };
-                    toEnter = {
-                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
-                        left: inputOffset.left,
-                        opacity: 1,
-                        transform: 'scale(1) ' + $interpolate('translate({{x}}px, {{y}}px)')({ x: correctionMatrix.x, y: correctionMatrix.y })
-                    };
-                    $animate.enter(picker, document.body, angular.element('body > *:last-child'), {
-                        from: fromEnter,
-                        to: toEnter
-                    }).then(function () {
-                        picker.css({ height: '', width: '' });
-                        picker.find('.label').focus();
-                    });
-                });
-
-                var checkTimeout;
-                picker.on('focus', 'button', function (e) {
-                    $timeout.cancel(checkTimeout);
-                });
-                picker.on('mousedown click mouseup', function (e) {
-                    $timeout.cancel(checkTimeout);
-                });
-                picker.on('keydown', function (e) {
-                    if (e.keyCode === 27) scope.closePicker();
-                });
-                picker.on('focusout', 'button', function (e) {
-                    checkTimeout = $timeout(function () {
-                        scope.closePicker();
-                        element.focus();
-                    });
-                });
-            }
-
-            function select($date) {
-                scope.uiSelect && scope.uiSelect({ $date: $date });
-                closePicker();
-            };
-
-            function closePicker(event) {
-                $animate.leave(mask);
-                toEnter.height = picker[0].scrollHeight;
-                $animate.leave(picker, {
-                    from: toEnter,
-                    to: fromEnter
-                }).then(function () {
-                    element.focus();
-                });
-                if (event) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            };
         }
     }
 })();
@@ -2391,6 +2391,23 @@
 'use strict';
 
 (function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
+
+    function uiCapitalize() {
+        return uiCapitalizeFilter;
+
+        ////////////////
+
+        function uiCapitalizeFilter(value) {
+            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
+        }
+    }
+})();
+'use strict';
+
+(function () {
 	'use strict';
 
 	angular.module('smn-ui').filter('uiStringDate', uiFullDate);
@@ -2424,23 +2441,6 @@
 		}
 		return date;
 	}
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
-
-    function uiCapitalize() {
-        return uiCapitalizeFilter;
-
-        ////////////////
-
-        function uiCapitalizeFilter(value) {
-            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
-        }
-    }
 })();
 'use strict';
 
