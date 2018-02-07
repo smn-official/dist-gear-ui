@@ -173,7 +173,7 @@
 			require: '^uiMainMenu',
 			link: link,
 			restrict: 'E',
-			template:'<div class="item-wrap"><a ng-href="{{item[config.href] || \'\'}}" ng-class="{\'has-submenu\': item[config.submenu]}" ng-click="item[config.submenu] ? openMenu() : (item[config.href] && menuClick())"><i class="material-icons option-icon" ng-class="{\'arrow-drop\': item[config.submenu]}" ng-if="item[config.submenu] || item[config.icon]">{{item[config.icon] || \'arrow_drop_down\'}}</i> {{item[config.name]}}</a><div ng-if="config.fav && item[config.href] && !item.denied"><i class="material-icons" ng-if="!item[config.fav.attr]" ng-click="config.fav.active(item)">{{config.fav.icon || \'favorite_border\'}}</i> <i class="material-icons" ng-if="item[config.fav.attr]" ng-click="config.fav.inative(item)" style="color:#E53935" ng-style="{color: config.fav.activeColor}">{{config.fav.iconActive || \'favorite\'}}</i></div></div>',
+			template:'<div class="item-wrap"><a ng-href="{{item[config.href] || \'\'}}" ng-class="{\'has-submenu\': item[config.submenu]}" ng-click="item[config.submenu] ? openMenu() : (item[config.href] && menuClick())"><i class="material-icons option-icon" ng-class="{\'arrow-drop\': item[config.submenu]}" ng-if="item[config.submenu] || item[config.icon]">{{item[config.icon] || \'arrow_drop_down\'}}</i> {{item[config.name]}}</a><div ng-if="config.fav && item[config.href] && !item.denied"><i class="material-icons" ng-if="!item[config.fav.attr]" ng-click="config.fav.active(item)" style="color:#E53935" ng-style="{color: config.fav.activeColor}">{{config.fav.icon || \'favorite_border\'}}</i> <i class="material-icons" ng-if="item[config.fav.attr]" ng-click="config.fav.inative(item)" style="color:#E53935" ng-style="{color: config.fav.activeColor}">{{config.fav.iconActive || \'favorite\'}}</i></div></div>',
 			scope: {
 				'item': '=',
 				'list': '=',
@@ -2018,28 +2018,6 @@
 (function () {
     'use strict';
 
-    angular.module('smn-ui').component('uiInputContainer', {
-        controller: uiInputContainerController,
-        require: '?ngModel',
-        bindings: {
-            'ngModel': '=?'
-        }
-    });
-
-    uiInputContainerController.$inject = ['$element'];
-    function uiInputContainerController($element) {
-        var $ctrl = this;
-
-        $ctrl.$postLink = function () {
-            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
-        };
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     uiChipsController.$inject = ["$element", "$timeout"];
     angular.module('smn-ui').component('uiChips', {
         controller: uiChipsController,
@@ -2210,6 +2188,28 @@
                 }
             });
         }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').component('uiInputContainer', {
+        controller: uiInputContainerController,
+        require: '?ngModel',
+        bindings: {
+            'ngModel': '=?'
+        }
+    });
+
+    uiInputContainerController.$inject = ['$element'];
+    function uiInputContainerController($element) {
+        var $ctrl = this;
+
+        $ctrl.$postLink = function () {
+            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
+        };
     }
 })();
 'use strict';
