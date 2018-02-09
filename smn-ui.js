@@ -424,9 +424,9 @@
 
         function uiPercentageFilter(percentage) {
             if (!percentage) return '';
-            percentage = percentage.toString().replace('%', '');
+            percentage = percentage.toString().replace('%', '').replace('.', ',');
 
-            if (!percentage.includes('-') && percentage.match(/^\-?\d+(\,\d+)?\%?$/g) === null) percentage = percentage.substr(0, percentage.length - 1);
+            if (!percentage.includes('-') && percentage.match(/^\-?\d+(\,)?(\d+)?\%?$/g) === null) percentage = percentage.substr(0, percentage.length - 1);
 
             if (percentage !== '') percentage += '%';
 
@@ -1997,25 +1997,6 @@
 'use strict';
 
 (function () {
-  'use strict';
-
-  angular.module('smn-ui').component('uiOption', {
-    controller: uiOptionController
-  });
-
-  uiOptionController.$inject = ['$element'];
-
-  function uiOptionController($element) {
-    var $ctrl = this;
-    $ctrl.$postLink = function () {
-      $element.wrapInner('<label></label>');
-      $element.find('input').addClass('ui-option').after('<div class="ui-option-shell"><div class="ui-option-fill"></div><div class="ui-option-mark"></div></div>');
-    };
-  }
-})();
-'use strict';
-
-(function () {
     'use strict';
 
     angular.module('smn-ui').component('uiInputContainer', {
@@ -2034,6 +2015,25 @@
             $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
         };
     }
+})();
+'use strict';
+
+(function () {
+  'use strict';
+
+  angular.module('smn-ui').component('uiOption', {
+    controller: uiOptionController
+  });
+
+  uiOptionController.$inject = ['$element'];
+
+  function uiOptionController($element) {
+    var $ctrl = this;
+    $ctrl.$postLink = function () {
+      $element.wrapInner('<label></label>');
+      $element.find('input').addClass('ui-option').after('<div class="ui-option-shell"><div class="ui-option-fill"></div><div class="ui-option-mark"></div></div>');
+    };
+  }
 })();
 'use strict';
 
