@@ -2018,6 +2018,28 @@
 (function () {
     'use strict';
 
+    angular.module('smn-ui').component('uiInputContainer', {
+        controller: uiInputContainerController,
+        require: '?ngModel',
+        bindings: {
+            'ngModel': '=?'
+        }
+    });
+
+    uiInputContainerController.$inject = ['$element'];
+    function uiInputContainerController($element) {
+        var $ctrl = this;
+
+        $ctrl.$postLink = function () {
+            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
+        };
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     uiChipsController.$inject = ["$element", "$timeout"];
     angular.module('smn-ui').component('uiChips', {
         controller: uiChipsController,
@@ -2188,28 +2210,6 @@
                 }
             });
         }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').component('uiInputContainer', {
-        controller: uiInputContainerController,
-        require: '?ngModel',
-        bindings: {
-            'ngModel': '=?'
-        }
-    });
-
-    uiInputContainerController.$inject = ['$element'];
-    function uiInputContainerController($element) {
-        var $ctrl = this;
-
-        $ctrl.$postLink = function () {
-            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
-        };
     }
 })();
 'use strict';
@@ -2396,23 +2396,6 @@
 'use strict';
 
 (function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
-
-    function uiCapitalize() {
-        return uiCapitalizeFilter;
-
-        ////////////////
-
-        function uiCapitalizeFilter(value) {
-            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
-        }
-    }
-})();
-'use strict';
-
-(function () {
 	'use strict';
 
 	angular.module('smn-ui').factory('uiWindow', uiWindow);
@@ -2441,6 +2424,23 @@
 
 		return service;
 	}
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
+
+    function uiCapitalize() {
+        return uiCapitalizeFilter;
+
+        ////////////////
+
+        function uiCapitalizeFilter(value) {
+            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
+        }
+    }
 })();
 'use strict';
 
@@ -3274,7 +3274,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 				scope.$watch('list', function () {
 					var _ref;
 
-					if (scope.list && scope.itemDefault) scope.list.splice(0, 0, angular.isObject(scope.list[0]) ? (_ref = {}, _defineProperty(_ref, scope.config.option, scope.itemDefault), _defineProperty(_ref, scope.config.value, null), _ref) : scope.itemDefault);
+					var iDefault = scope.list.filter(function (obj) {
+						return !!obj.default;
+					});
+					if (scope.list && scope.itemDefault && !iDefault.length) scope.list.splice(0, 0, angular.isObject(scope.list[0]) ? (_ref = {}, _defineProperty(_ref, scope.config.option, scope.itemDefault), _defineProperty(_ref, scope.config.value, null), _defineProperty(_ref, 'default', true), _ref) : scope.itemDefault);
 				});
 
 				scope.selected = function () {
