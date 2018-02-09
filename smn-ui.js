@@ -441,6 +441,96 @@
 (function () {
     'use strict';
 
+    uiMaskCpf.$inject = ["uiCpfFilter"];
+    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
+
+    function uiMaskCpf(uiCpfFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = uiCpfFilter(value);
+                ctrl.$setValidity('cpf', isValidCpf(viewValue));
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                value = typeof value == 'number' ? value.toString() : value;
+                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
+                return uiCpfFilter(value);
+            });
+
+            function isValidCpf(cpf) {
+                if (!cpf) return true;
+
+                if (cpf.length >= 14) {
+                    var valid = true;
+
+                    cpf = cpf.replace(/[^\d]+/g, '');
+
+                    if (cpf.length != 11) valid = false;
+
+                    var sum;
+                    var rest;
+                    sum = 0;
+                    if (cpf == "00000000000" || cpf == "11111111111" || cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" || cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" || cpf == "88888888888" || cpf == "99999999999") valid = false;
+
+                    for (var i = 1; i <= 9; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(9, 10))) valid = false;
+
+                    sum = 0;
+                    for (var i = 1; i <= 10; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(10, 11))) valid = false;
+
+                    if (!valid) return false;
+                }
+                return true;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCpf', uiCpf);
+
+    function uiCpf() {
+        return uiCpfFilter;
+
+        function uiCpfFilter(cpf) {
+            if (!cpf) return '';
+            cpf = cpf.toString().replace(/[^0-9]+/g, '');
+            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
+            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
+            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
+            if (cpf.length > 14) cpf = cpf.substring(0, 14);
+            return cpf;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     angular.module('smn-ui').service('uiCurrencyMaskUtils', uiCurrencyMaskUtils);
 
     function uiCurrencyMaskUtils() {
@@ -662,96 +752,6 @@
                 newCurrency = currencyChar + newCurrency;
             }
             return newCurrency;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMaskCpf.$inject = ["uiCpfFilter"];
-    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
-
-    function uiMaskCpf(uiCpfFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = uiCpfFilter(value);
-                ctrl.$setValidity('cpf', isValidCpf(viewValue));
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                value = typeof value == 'number' ? value.toString() : value;
-                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
-                return uiCpfFilter(value);
-            });
-
-            function isValidCpf(cpf) {
-                if (!cpf) return true;
-
-                if (cpf.length >= 14) {
-                    var valid = true;
-
-                    cpf = cpf.replace(/[^\d]+/g, '');
-
-                    if (cpf.length != 11) valid = false;
-
-                    var sum;
-                    var rest;
-                    sum = 0;
-                    if (cpf == "00000000000" || cpf == "11111111111" || cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" || cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" || cpf == "88888888888" || cpf == "99999999999") valid = false;
-
-                    for (var i = 1; i <= 9; i++) {
-                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
-                    }rest = sum * 10 % 11;
-
-                    if (rest == 10 || rest == 11) rest = 0;
-                    if (rest != parseInt(cpf.substring(9, 10))) valid = false;
-
-                    sum = 0;
-                    for (var i = 1; i <= 10; i++) {
-                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
-                    }rest = sum * 10 % 11;
-
-                    if (rest == 10 || rest == 11) rest = 0;
-                    if (rest != parseInt(cpf.substring(10, 11))) valid = false;
-
-                    if (!valid) return false;
-                }
-                return true;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCpf', uiCpf);
-
-    function uiCpf() {
-        return uiCpfFilter;
-
-        function uiCpfFilter(cpf) {
-            if (!cpf) return '';
-            cpf = cpf.toString().replace(/[^0-9]+/g, '');
-            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
-            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
-            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
-            if (cpf.length > 14) cpf = cpf.substring(0, 14);
-            return cpf;
         }
     }
 })();
@@ -1550,6 +1550,47 @@
 (function () {
     'use strict';
 
+    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
+
+    function uiMaxLength() {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: ['ngModel', '?^form'],
+            scope: {
+                uiMaxlength: '='
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            scope.$watch('uiMaxlength', function (value, oldValue) {
+                element.attr('maxlength', value);
+            });
+            // ctrl[0].$formatters.unshift(formatValue);
+            // ctrl[0].$parsers.unshift(formatValue);
+            function formatValue(value) {
+                if (!value || !scope.uiMaxLength) return value;
+                var newValue = value.toString();
+                var maxLength = parseInt(scope.uiMaxLength);
+                if (isNaN(maxLength)) return;
+                newValue = newValue.substring(0, maxLength);
+                var isModelPristine = ctrl[0].$pristine,
+                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
+                ctrl[0].$setViewValue(newValue);
+                ctrl[0].$render();
+                isModelPristine && ctrl[0].$setPristine();
+                isFormPristine && ctrl[1].$setPristine();
+                return newValue;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     angular.module('smn-ui').filter('uiMinute', uiMinute);
 
     function uiMinute() {
@@ -1595,47 +1636,6 @@
 
             function formatValue(value) {
                 return uiMinuteFilter(value);
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
-
-    function uiMaxLength() {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: ['ngModel', '?^form'],
-            scope: {
-                uiMaxlength: '='
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            scope.$watch('uiMaxlength', function (value, oldValue) {
-                element.attr('maxlength', value);
-            });
-            // ctrl[0].$formatters.unshift(formatValue);
-            // ctrl[0].$parsers.unshift(formatValue);
-            function formatValue(value) {
-                if (!value || !scope.uiMaxLength) return value;
-                var newValue = value.toString();
-                var maxLength = parseInt(scope.uiMaxLength);
-                if (isNaN(maxLength)) return;
-                newValue = newValue.substring(0, maxLength);
-                var isModelPristine = ctrl[0].$pristine,
-                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
-                ctrl[0].$setViewValue(newValue);
-                ctrl[0].$render();
-                isModelPristine && ctrl[0].$setPristine();
-                isFormPristine && ctrl[1].$setPristine();
-                return newValue;
             }
         }
     }
@@ -2396,6 +2396,23 @@
 'use strict';
 
 (function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
+
+    function uiCapitalize() {
+        return uiCapitalizeFilter;
+
+        ////////////////
+
+        function uiCapitalizeFilter(value) {
+            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
+        }
+    }
+})();
+'use strict';
+
+(function () {
 	'use strict';
 
 	angular.module('smn-ui').factory('uiWindow', uiWindow);
@@ -2424,23 +2441,6 @@
 
 		return service;
 	}
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCapitalize', uiCapitalize);
-
-    function uiCapitalize() {
-        return uiCapitalizeFilter;
-
-        ////////////////
-
-        function uiCapitalizeFilter(value) {
-            return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
-        }
-    }
 })();
 'use strict';
 
