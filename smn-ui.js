@@ -204,6 +204,304 @@
 (function () {
     'use strict';
 
+    angular.module('smn-ui').directive('uiInputFile', uiInputFile);
+
+    uiInputFile.$inject = ['$compile'];
+
+    function uiInputFile($compile) {
+        var directive = {
+            require: 'ngModel',
+            restrict: 'A',
+            link: link,
+            scope: {
+                'ngModel': '=',
+                'accept': '@?',
+                'uiFileChange': '&',
+                'uiMaxSize': '@?',
+                'uiMaxFileSize': '@?',
+                'uiValidExt': '@?',
+                'uiRead': '&?',
+                'uiError': '=?',
+                'uiReadDataUrl': '=?'
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$formatters.push(function (value) {
+                if (!value) {
+                    element.val('').trigger('change');
+                    ctrl.$setValidity('uiMaxSize', true);
+                    ctrl.$setValidity('uiMaxFileSize', true);
+                    ctrl.$setValidity('uiAccept', true);
+                }
+            });
+            ctrl.$parsers.push(function (value) {
+                if (!value) element.val('').trigger('change');
+            });
+
+            element[0].addEventListener('change', handleFileSelect, false);
+            function handleFileSelect(e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                var files = e.target.files;
+                scope.$apply(function () {
+                    scope.uiReadDataUrl = 'uiReadDataUrl' in attrs && files.length ? [] : null;
+                    ctrl.$setDirty();
+                    ctrl.$setValidity('uiMaxSize', true);
+                    ctrl.$setValidity('uiMaxFileSize', true);
+                    ctrl.$setValidity('uiAccept', true);
+
+                    // Verificação de tamanho
+                    var maxSize = scope.uiMaxSize ? toByte(scope.uiMaxSize) : null,
+                        maxFileSize = scope.uiMaxFileSize ? toByte(scope.uiMaxFileSize) : null,
+                        accepts = scope.accept.split(',');
+                    var sum = 0;
+                    for (var i = 0; i < files.length; i++) {
+                        var file = files[i],
+                            fileSize = file.size,
+                            fileType = file.type,
+                            validMaxFileSize = maxFileSize && fileSize > maxFileSize,
+                            validMaxSize = maxSize && sum > maxSize,
+                            fileExtension = file.name.substring(file.name.lastIndexOf('.') + 1);
+
+                        if (validMaxFileSize) ctrl.$setValidity('uiMaxFileSize', false);
+                        sum += fileSize;
+
+                        // Verificar MIME Types
+                        var validType = false;
+                        for (var j = 0; j < accepts.length; j++) {
+                            var accept = accepts[j].trim();
+                            // Checa se tem apenas um asterisco
+                            // e se ele está no final
+                            var regex = accept.match(/^[^\*]*\*$/) ? new RegExp('^' + accept) : new RegExp('^' + accept + '$');
+                            if (fileType.match(regex) || fileExtension.match(regex)) {
+                                validType = true;
+                                break;
+                            }
+                        }
+                        if (!validType) ctrl.$setValidity('uiAccept', false);
+
+                        if (maxSize && sum > maxSize) ctrl.$setValidity('uiMaxSize', false);
+
+                        if (validType && !validMaxFileSize && !validMaxSize) {
+                            scope.uiReadDataUrl.push({});
+                            readFile(file, scope.uiReadDataUrl[i], i);
+                        } else if (scope.uiError) {
+                            scope.uiError(file, {
+                                type: !validType,
+                                maxSize: validMaxSize,
+                                maxFileSize: validMaxFileSize
+                            }, i);
+                        }
+                    }
+
+                    scope.ngModel = e.target.files;
+
+                    scope.uiFileChange({ '$files': scope.ngModel, '$error': ctrl.$invalid ? ctrl.$error : null });
+                });
+            }
+
+            function toByte(sizeString) {
+                sizeString = sizeString.toString();
+                var unitMatch = sizeString.match(/[a-zA-Z]+/g),
+                    unit = unitMatch ? unitMatch[0] : null,
+                    sizeMatch = sizeString.match(/\d+/),
+                    unitSize = sizeMatch ? parseInt(sizeMatch[0]) : null,
+                    size = unitSize;
+                switch (unit) {
+                    case 'KB':
+                        size = unitSize * 1024;
+                        break;
+                    case 'MB':
+                        size = unitSize * Math.pow(1024, 2);
+                        break;
+                    case 'GB':
+                        size = unitSize * Math.pow(1024, 3);
+                        break;
+                    case 'TB':
+                        size = unitSize * Math.pow(1024, 4);
+                        break;
+                    case 'PB':
+                        size = unitSize * Math.pow(1024, 5);
+                        break;
+                    case 'EB':
+                        size = unitSize * Math.pow(1024, 6);
+                        break;
+                    case 'ZB':
+                        size = unitSize * Math.pow(1024, 7);
+                        break;
+                    case 'YB':
+                        size = unitSize * Math.pow(1024, 8);
+                        break;
+                }
+                return size;
+            }
+
+            function readFile(file, data, index) {
+                var reader = new FileReader();
+                data.resolved = 'false';
+                reader.onload = function (e) {
+                    scope.$apply(function () {
+                        data.result = e.target.result;
+                        data.resolved = true;
+                        scope.uiRead && scope.uiRead({ $data: data.result, $index: index, $file: file });
+                    });
+                };
+                reader.onerror = function (e) {
+                    scope.$apply(function () {
+                        data.error = e.target.error;
+                    });
+                };
+                reader.onprogress = function (e) {
+                    if (!e.lengthComputable) return;
+                    scope.$apply(function () {
+                        data.progress = {
+                            loaded: e.loaded,
+                            total: e.total,
+                            percent: Math.round(e.loaded / e.total * 100)
+                        };
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiDatepicker.$inject = ["$compile", "$timeout", "$animate", "$interpolate"];
+    angular.module('smn-ui').directive('uiDatepicker', uiDatepicker);
+
+    function uiDatepicker($compile, $timeout, $animate, $interpolate) {
+        var directive = {
+            require: 'ngModel',
+            link: link,
+            restrict: 'A',
+            scope: {
+                ngModel: '=',
+                uiDateFormat: '@?',
+                uiDatepicker: '@?',
+                uiSelect: '&?',
+                uiMinDate: '=?',
+                uiMaxDate: '=?',
+                ngReadonly: '=?',
+                uiViewDate: '=?'
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            var picker,
+                mask,
+                pickerGroup,
+                fromEnter,
+                toEnter,
+                target = scope.uiDatepicker ? angular.element(scope.uiDatepicker) : element;
+
+            element.on(attrs.uiPickerEvent || 'focus', function (e) {
+                renderPicker(target);
+            });
+
+            scope.closePicker = closePicker;
+            scope.select = select;
+
+            function renderPicker(target) {
+                pickerGroup = $compile('<ui-background-mask class="ui-picker-mask" ng-mousedown="closePicker($event)"></ui-background-mask>' + '<ui-calendar class="ui-picker" ' + 'tabindex="0" ' + 'ui-select="select($date)" ' + 'ui-cancel="closePicker()" ' + 'ui-view-date="uiViewDate" ' + 'ui-min-date="uiMinDate" ' + 'ui-max-date="uiMaxDate" ' + 'ui-view-date="ngModel" ' + ('uiInitOnSelected' in attrs ? 'ui-init-on-selected ' : '') + 'ng-model="ngModel"></ui-calendar>')(scope);
+                var inputOffset = target.offset(),
+                    padding = 16;
+
+                angular.element('body').append(pickerGroup);
+                mask = angular.element(pickerGroup[0]);
+                picker = angular.element(pickerGroup[1]);
+
+                $timeout(function () {
+                    var pickerSize = {
+                        height: picker[0].scrollHeight,
+                        width: picker[0].clientWidth
+                    };
+
+                    var correctionMatrix = {
+                        x: 0,
+                        y: 0
+                    };
+
+                    var pickerHorizontalCoveringArea = inputOffset.left + picker[0].clientWidth + padding + (!scope.ngReadonly ? target[0].clientHeight : 0),
+                        pickerVerticalCoveringArea = inputOffset.top + picker[0].clientHeight + padding + (!scope.ngReadonly ? target[0].clientHeight : 0);
+
+                    if (pickerHorizontalCoveringArea > window.innerWidth + document.body.scrollTop) correctionMatrix.x = window.innerWidth + document.body.scrollTop - pickerHorizontalCoveringArea;
+                    if (pickerVerticalCoveringArea > window.innerHeight + document.body.scrollTop) correctionMatrix.y = window.innerHeight + document.body.scrollTop - pickerVerticalCoveringArea;
+
+                    fromEnter = {
+                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
+                        left: inputOffset.left,
+                        opacity: 0,
+                        transform: 'scale(0) translate(0px, 0px)'
+                    };
+                    toEnter = {
+                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
+                        left: inputOffset.left,
+                        opacity: 1,
+                        transform: 'scale(1) ' + $interpolate('translate({{x}}px, {{y}}px)')({ x: correctionMatrix.x, y: correctionMatrix.y })
+                    };
+                    $animate.enter(picker, document.body, angular.element('body > *:last-child'), {
+                        from: fromEnter,
+                        to: toEnter
+                    }).then(function () {
+                        picker.css({ height: '', width: '' });
+                        picker.find('.label').focus();
+                    });
+                });
+
+                var checkTimeout;
+                picker.on('focus', 'button', function (e) {
+                    $timeout.cancel(checkTimeout);
+                });
+                picker.on('mousedown click mouseup', function (e) {
+                    $timeout.cancel(checkTimeout);
+                });
+                picker.on('keydown', function (e) {
+                    if (e.keyCode === 27) scope.closePicker();
+                });
+                picker.on('focusout', 'button', function (e) {
+                    checkTimeout = $timeout(function () {
+                        scope.closePicker();
+                        element.focus();
+                    });
+                });
+            }
+
+            function select($date) {
+                scope.uiSelect && scope.uiSelect({ $date: $date });
+                closePicker();
+            };
+
+            function closePicker(event) {
+                $animate.leave(mask);
+                toEnter.height = picker[0].scrollHeight;
+                $animate.leave(picker, {
+                    from: toEnter,
+                    to: fromEnter
+                }).then(function () {
+                    element.focus();
+                });
+                if (event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            };
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     uiMaskPhonenumber.$inject = ["uiPhonenumberFilter", "$timeout"];
     angular.module('smn-ui').directive('uiMaskPhonenumber', uiMaskPhonenumber);
 
@@ -760,6 +1058,113 @@
 (function () {
     'use strict';
 
+    uiMaskCep.$inject = ["uiCepFilter", "$timeout"];
+    angular.module('smn-ui').directive('uiMaskCep', uiMaskCep);
+
+    function uiMaskCep(uiCepFilter, $timeout) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            var beforeSelIndex, afterSelIndex, futureSelIndex;
+
+            element.on('keydown', function () {
+                beforeSelIndex = doGetCaretPosition(element[0]);
+            });
+
+            ctrl.$parsers.push(function (value) {
+                afterSelIndex = doGetCaretPosition(element[0]);
+
+                var viewValue = uiCepFilter(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+
+                if (element[0].selectionStart || element[0].selectionStart == '0') {
+                    switch (true) {
+                        case beforeSelIndex == 5 && afterSelIndex == 6:
+                            futureSelIndex = 7;
+                            break;
+                        default:
+                            futureSelIndex = afterSelIndex;
+                    }
+                    setCaretPosition(element[0], futureSelIndex);
+                    $timeout(function () {
+                        setCaretPosition(element[0], futureSelIndex);
+                    });
+                }
+
+                if (viewValue.length === 9) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                return uiCepFilter(value);
+            });
+
+            function doGetCaretPosition(elem) {
+                var caretPos = 0;
+                // IE Support
+                if (document.selection) {
+                    elem.focus();
+                    var sel = document.selection.createRange();
+                    sel.moveStart('character', -elem.value.length);
+                    caretPos = sel.text.length;
+                }
+                // Firefox support
+                else if (elem.selectionStart || elem.selectionStart == '0') {
+                        caretPos = elem.selectionStart;
+                    }
+
+                return caretPos;
+            }
+
+            function setCaretPosition(elem, caretPos) {
+                if (elem != null) {
+                    if (elem.createTextRange) {
+                        var range = elem.createTextRange();
+                        range.move('character', caretPos);
+                        range.select();
+                    } else {
+                        if (elem.selectionStart) {
+                            elem.focus();
+                            elem.setSelectionRange(caretPos, caretPos);
+                        } else {
+                            elem.focus();
+                        }
+                    }
+                }
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCep', uiCep);
+
+    function uiCep() {
+        return uiCepFilter;
+
+        function uiCepFilter(cep) {
+            if (!cep) return '';
+            cep = cep.toString().replace(/[^0-9]+/g, '');
+            if (cep.length > 5) cep = cep.substring(0, 5) + '-' + cep.substring(5);
+            if (cep.length > 9) cep = cep.substring(0, 9);
+            return cep;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     uiMaskCnpj.$inject = ["uiCnpjFilter", "$timeout"];
     angular.module('smn-ui').directive('uiMaskCnpj', uiMaskCnpj);
 
@@ -915,411 +1320,6 @@
             if (cnpj.length > 15) cnpj = cnpj.substring(0, 15) + '-' + cnpj.substring(15);
             if (cnpj.length > 18) cnpj = cnpj.substring(0, 18);
             return cnpj;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMaskCep.$inject = ["uiCepFilter", "$timeout"];
-    angular.module('smn-ui').directive('uiMaskCep', uiMaskCep);
-
-    function uiMaskCep(uiCepFilter, $timeout) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            var beforeSelIndex, afterSelIndex, futureSelIndex;
-
-            element.on('keydown', function () {
-                beforeSelIndex = doGetCaretPosition(element[0]);
-            });
-
-            ctrl.$parsers.push(function (value) {
-                afterSelIndex = doGetCaretPosition(element[0]);
-
-                var viewValue = uiCepFilter(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-
-                if (element[0].selectionStart || element[0].selectionStart == '0') {
-                    switch (true) {
-                        case beforeSelIndex == 5 && afterSelIndex == 6:
-                            futureSelIndex = 7;
-                            break;
-                        default:
-                            futureSelIndex = afterSelIndex;
-                    }
-                    setCaretPosition(element[0], futureSelIndex);
-                    $timeout(function () {
-                        setCaretPosition(element[0], futureSelIndex);
-                    });
-                }
-
-                if (viewValue.length === 9) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                return uiCepFilter(value);
-            });
-
-            function doGetCaretPosition(elem) {
-                var caretPos = 0;
-                // IE Support
-                if (document.selection) {
-                    elem.focus();
-                    var sel = document.selection.createRange();
-                    sel.moveStart('character', -elem.value.length);
-                    caretPos = sel.text.length;
-                }
-                // Firefox support
-                else if (elem.selectionStart || elem.selectionStart == '0') {
-                        caretPos = elem.selectionStart;
-                    }
-
-                return caretPos;
-            }
-
-            function setCaretPosition(elem, caretPos) {
-                if (elem != null) {
-                    if (elem.createTextRange) {
-                        var range = elem.createTextRange();
-                        range.move('character', caretPos);
-                        range.select();
-                    } else {
-                        if (elem.selectionStart) {
-                            elem.focus();
-                            elem.setSelectionRange(caretPos, caretPos);
-                        } else {
-                            elem.focus();
-                        }
-                    }
-                }
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCep', uiCep);
-
-    function uiCep() {
-        return uiCepFilter;
-
-        function uiCepFilter(cep) {
-            if (!cep) return '';
-            cep = cep.toString().replace(/[^0-9]+/g, '');
-            if (cep.length > 5) cep = cep.substring(0, 5) + '-' + cep.substring(5);
-            if (cep.length > 9) cep = cep.substring(0, 9);
-            return cep;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiInputFile', uiInputFile);
-
-    uiInputFile.$inject = ['$compile'];
-
-    function uiInputFile($compile) {
-        var directive = {
-            require: 'ngModel',
-            restrict: 'A',
-            link: link,
-            scope: {
-                'ngModel': '=',
-                'accept': '@?',
-                'uiFileChange': '&',
-                'uiMaxSize': '@?',
-                'uiMaxFileSize': '@?',
-                'uiValidExt': '@?',
-                'uiRead': '&?',
-                'uiError': '=?',
-                'uiReadDataUrl': '=?'
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$formatters.push(function (value) {
-                if (!value) {
-                    element.val('').trigger('change');
-                    ctrl.$setValidity('uiMaxSize', true);
-                    ctrl.$setValidity('uiMaxFileSize', true);
-                    ctrl.$setValidity('uiAccept', true);
-                }
-            });
-            ctrl.$parsers.push(function (value) {
-                if (!value) element.val('').trigger('change');
-            });
-
-            element[0].addEventListener('change', handleFileSelect, false);
-            function handleFileSelect(e) {
-                e.stopPropagation();
-                e.preventDefault();
-
-                var files = e.target.files;
-                scope.$apply(function () {
-                    scope.uiReadDataUrl = 'uiReadDataUrl' in attrs && files.length ? [] : null;
-                    ctrl.$setDirty();
-                    ctrl.$setValidity('uiMaxSize', true);
-                    ctrl.$setValidity('uiMaxFileSize', true);
-                    ctrl.$setValidity('uiAccept', true);
-
-                    // Verificação de tamanho
-                    var maxSize = scope.uiMaxSize ? toByte(scope.uiMaxSize) : null,
-                        maxFileSize = scope.uiMaxFileSize ? toByte(scope.uiMaxFileSize) : null,
-                        accepts = scope.accept.split(',');
-                    var sum = 0;
-                    for (var i = 0; i < files.length; i++) {
-                        var file = files[i],
-                            fileSize = file.size,
-                            fileType = file.type,
-                            validMaxFileSize = maxFileSize && fileSize > maxFileSize,
-                            validMaxSize = maxSize && sum > maxSize,
-                            fileExtension = file.name.substring(file.name.lastIndexOf('.') + 1);
-
-                        if (validMaxFileSize) ctrl.$setValidity('uiMaxFileSize', false);
-                        sum += fileSize;
-
-                        // Verificar MIME Types
-                        var validType = false;
-                        for (var j = 0; j < accepts.length; j++) {
-                            var accept = accepts[j].trim();
-                            // Checa se tem apenas um asterisco
-                            // e se ele está no final
-                            var regex = accept.match(/^[^\*]*\*$/) ? new RegExp('^' + accept) : new RegExp('^' + accept + '$');
-                            if (fileType.match(regex) || fileExtension.match(regex)) {
-                                validType = true;
-                                break;
-                            }
-                        }
-                        if (!validType) ctrl.$setValidity('uiAccept', false);
-
-                        if (maxSize && sum > maxSize) ctrl.$setValidity('uiMaxSize', false);
-
-                        if (validType && !validMaxFileSize && !validMaxSize) {
-                            scope.uiReadDataUrl.push({});
-                            readFile(file, scope.uiReadDataUrl[i], i);
-                        } else if (scope.uiError) {
-                            scope.uiError(file, {
-                                type: !validType,
-                                maxSize: validMaxSize,
-                                maxFileSize: validMaxFileSize
-                            }, i);
-                        }
-                    }
-
-                    scope.ngModel = e.target.files;
-
-                    scope.uiFileChange({ '$files': scope.ngModel, '$error': ctrl.$invalid ? ctrl.$error : null });
-                });
-            }
-
-            function toByte(sizeString) {
-                sizeString = sizeString.toString();
-                var unitMatch = sizeString.match(/[a-zA-Z]+/g),
-                    unit = unitMatch ? unitMatch[0] : null,
-                    sizeMatch = sizeString.match(/\d+/),
-                    unitSize = sizeMatch ? parseInt(sizeMatch[0]) : null,
-                    size = unitSize;
-                switch (unit) {
-                    case 'KB':
-                        size = unitSize * 1024;
-                        break;
-                    case 'MB':
-                        size = unitSize * Math.pow(1024, 2);
-                        break;
-                    case 'GB':
-                        size = unitSize * Math.pow(1024, 3);
-                        break;
-                    case 'TB':
-                        size = unitSize * Math.pow(1024, 4);
-                        break;
-                    case 'PB':
-                        size = unitSize * Math.pow(1024, 5);
-                        break;
-                    case 'EB':
-                        size = unitSize * Math.pow(1024, 6);
-                        break;
-                    case 'ZB':
-                        size = unitSize * Math.pow(1024, 7);
-                        break;
-                    case 'YB':
-                        size = unitSize * Math.pow(1024, 8);
-                        break;
-                }
-                return size;
-            }
-
-            function readFile(file, data, index) {
-                var reader = new FileReader();
-                data.resolved = 'false';
-                reader.onload = function (e) {
-                    scope.$apply(function () {
-                        data.result = e.target.result;
-                        data.resolved = true;
-                        scope.uiRead && scope.uiRead({ $data: data.result, $index: index, $file: file });
-                    });
-                };
-                reader.onerror = function (e) {
-                    scope.$apply(function () {
-                        data.error = e.target.error;
-                    });
-                };
-                reader.onprogress = function (e) {
-                    if (!e.lengthComputable) return;
-                    scope.$apply(function () {
-                        data.progress = {
-                            loaded: e.loaded,
-                            total: e.total,
-                            percent: Math.round(e.loaded / e.total * 100)
-                        };
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiDatepicker.$inject = ["$compile", "$timeout", "$animate", "$interpolate"];
-    angular.module('smn-ui').directive('uiDatepicker', uiDatepicker);
-
-    function uiDatepicker($compile, $timeout, $animate, $interpolate) {
-        var directive = {
-            require: 'ngModel',
-            link: link,
-            restrict: 'A',
-            scope: {
-                ngModel: '=',
-                uiDateFormat: '@?',
-                uiDatepicker: '@?',
-                uiSelect: '&?',
-                uiMinDate: '=?',
-                uiMaxDate: '=?',
-                ngReadonly: '=?',
-                uiViewDate: '=?'
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            var picker,
-                mask,
-                pickerGroup,
-                fromEnter,
-                toEnter,
-                target = scope.uiDatepicker ? angular.element(scope.uiDatepicker) : element;
-
-            element.on(attrs.uiPickerEvent || 'focus', function (e) {
-                renderPicker(target);
-            });
-
-            scope.closePicker = closePicker;
-            scope.select = select;
-
-            function renderPicker(target) {
-                pickerGroup = $compile('<ui-background-mask class="ui-picker-mask" ng-mousedown="closePicker($event)"></ui-background-mask>' + '<ui-calendar class="ui-picker" ' + 'tabindex="0" ' + 'ui-select="select($date)" ' + 'ui-cancel="closePicker()" ' + 'ui-view-date="uiViewDate" ' + 'ui-min-date="uiMinDate" ' + 'ui-max-date="uiMaxDate" ' + 'ui-view-date="ngModel" ' + ('uiInitOnSelected' in attrs ? 'ui-init-on-selected ' : '') + 'ng-model="ngModel"></ui-calendar>')(scope);
-                var inputOffset = target.offset(),
-                    padding = 16;
-
-                angular.element('body').append(pickerGroup);
-                mask = angular.element(pickerGroup[0]);
-                picker = angular.element(pickerGroup[1]);
-
-                $timeout(function () {
-                    var pickerSize = {
-                        height: picker[0].scrollHeight,
-                        width: picker[0].clientWidth
-                    };
-
-                    var correctionMatrix = {
-                        x: 0,
-                        y: 0
-                    };
-
-                    var pickerHorizontalCoveringArea = inputOffset.left + picker[0].clientWidth + padding + (!scope.ngReadonly ? target[0].clientHeight : 0),
-                        pickerVerticalCoveringArea = inputOffset.top + picker[0].clientHeight + padding + (!scope.ngReadonly ? target[0].clientHeight : 0);
-
-                    if (pickerHorizontalCoveringArea > window.innerWidth + document.body.scrollTop) correctionMatrix.x = window.innerWidth + document.body.scrollTop - pickerHorizontalCoveringArea;
-                    if (pickerVerticalCoveringArea > window.innerHeight + document.body.scrollTop) correctionMatrix.y = window.innerHeight + document.body.scrollTop - pickerVerticalCoveringArea;
-
-                    fromEnter = {
-                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
-                        left: inputOffset.left,
-                        opacity: 0,
-                        transform: 'scale(0) translate(0px, 0px)'
-                    };
-                    toEnter = {
-                        top: inputOffset.top + (!scope.ngReadonly ? target[0].clientHeight : 0),
-                        left: inputOffset.left,
-                        opacity: 1,
-                        transform: 'scale(1) ' + $interpolate('translate({{x}}px, {{y}}px)')({ x: correctionMatrix.x, y: correctionMatrix.y })
-                    };
-                    $animate.enter(picker, document.body, angular.element('body > *:last-child'), {
-                        from: fromEnter,
-                        to: toEnter
-                    }).then(function () {
-                        picker.css({ height: '', width: '' });
-                        picker.find('.label').focus();
-                    });
-                });
-
-                var checkTimeout;
-                picker.on('focus', 'button', function (e) {
-                    $timeout.cancel(checkTimeout);
-                });
-                picker.on('mousedown click mouseup', function (e) {
-                    $timeout.cancel(checkTimeout);
-                });
-                picker.on('keydown', function (e) {
-                    if (e.keyCode === 27) scope.closePicker();
-                });
-                picker.on('focusout', 'button', function (e) {
-                    checkTimeout = $timeout(function () {
-                        scope.closePicker();
-                        element.focus();
-                    });
-                });
-            }
-
-            function select($date) {
-                scope.uiSelect && scope.uiSelect({ $date: $date });
-                closePicker();
-            };
-
-            function closePicker(event) {
-                $animate.leave(mask);
-                toEnter.height = picker[0].scrollHeight;
-                $animate.leave(picker, {
-                    from: toEnter,
-                    to: fromEnter
-                }).then(function () {
-                    element.focus();
-                });
-                if (event) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            };
         }
     }
 })();
@@ -1548,436 +1548,6 @@
 'use strict';
 
 (function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiMinute', uiMinute);
-
-    function uiMinute() {
-        return uiMinuteFilter;
-
-        ////////////////
-
-        function uiMinuteFilter(value) {
-            if (value === undefined || value === null) return null;
-
-            value = value.toString().substring(0, 2).replace(/\D+/g, '');
-            value = value ? parseInt(value) : null;
-            return value;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMinute.$inject = ["uiMinuteFilter"];
-    angular.module('smn-ui').directive('uiMinute', uiMinute);
-
-    function uiMinute(uiMinuteFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel',
-            scope: {}
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = formatValue(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                viewValue = /^([0-9]|[1-4][0-9]|5[0-9])$/.test(viewValue) ? viewValue : undefined;
-                return viewValue;
-            });
-            ctrl.$formatters.push(formatValue);
-
-            function formatValue(value) {
-                return uiMinuteFilter(value);
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
-
-    function uiMaxLength() {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: ['ngModel', '?^form'],
-            scope: {
-                uiMaxlength: '='
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            scope.$watch('uiMaxlength', function (value, oldValue) {
-                element.attr('maxlength', value);
-            });
-            // ctrl[0].$formatters.unshift(formatValue);
-            // ctrl[0].$parsers.unshift(formatValue);
-            function formatValue(value) {
-                if (!value || !scope.uiMaxLength) return value;
-                var newValue = value.toString();
-                var maxLength = parseInt(scope.uiMaxLength);
-                if (isNaN(maxLength)) return;
-                newValue = newValue.substring(0, maxLength);
-                var isModelPristine = ctrl[0].$pristine,
-                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
-                ctrl[0].$setViewValue(newValue);
-                ctrl[0].$render();
-                isModelPristine && ctrl[0].$setPristine();
-                isFormPristine && ctrl[1].$setPristine();
-                return newValue;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMaskDate.$inject = ["$filter", "$timeout"];
-    angular.module('smn-ui').directive('uiMaskDate', uiMaskDate);
-
-    function uiMaskDate($filter, $timeout) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel',
-            scope: {
-                uiMaxDate: '=',
-                uiMinDate: '='
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            var beforeSelIndex, afterSelIndex, futureSelIndex;
-
-            element.on('keydown', function () {
-                beforeSelIndex = doGetCaretPosition(element[0]);
-            });
-
-            ctrl.$parsers.push(function (value) {
-                afterSelIndex = doGetCaretPosition(element[0]);
-
-                var viewValue = formatDate(ctrl.$viewValue);
-                var check = checkDate(viewValue);
-
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-
-                if (element[0].selectionStart || element[0].selectionStart == '0') {
-                    switch (true) {
-                        case beforeSelIndex == 2 && afterSelIndex == 3:
-                            futureSelIndex = 4;
-                            break;
-                        case beforeSelIndex == 5 && afterSelIndex == 6:
-                            futureSelIndex = 7;
-                            break;
-                        default:
-                            futureSelIndex = afterSelIndex;
-                    }
-                    setCaretPosition(element[0], futureSelIndex);
-                    $timeout(function () {
-                        setCaretPosition(element[0], futureSelIndex);
-                    });
-                }
-
-                if (viewValue.length === 10 && check) {
-                    var dateArray = viewValue.split('/');
-
-                    ctrl.$setValidity('max', !(scope.uiMaxDate && scope.uiMaxDate < check));
-                    ctrl.$setValidity('min', !(scope.uiMinDate && scope.uiMinDate > check));
-
-                    return new Date(dateArray[2], dateArray[1] - 1, dateArray[0]);
-                }
-
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                return $filter('date')(value, 'dd/MM/yyyy');
-            });
-
-            scope.$watch('uiMaxDate', function () {
-                var viewValue = formatDate(ctrl.$viewValue);
-                var check = checkDate(viewValue);
-
-                ctrl.$setValidity('max', true);
-                if (check && scope.uiMinDate) ctrl.$setValidity('max', !(scope.uiMaxDate < check));
-            });
-
-            scope.$watch('uiMinDate', function () {
-                var viewValue = formatDate(ctrl.$viewValue);
-                var check = checkDate(viewValue);
-
-                ctrl.$setValidity('min', true);
-                if (check && scope.uiMinDate) ctrl.$setValidity('min', scope.uiMinDate <= check);
-            });
-
-            function formatDate(date) {
-                if (!date) return '';
-                date = date.replace(/[^0-9]+/g, '');
-                if (date.length > 2) date = date.substring(0, 2) + '/' + date.substring(2);
-                if (date.length > 5) date = date.substring(0, 5) + '/' + date.substring(5, 9);
-                return date;
-            }
-
-            function checkDate(value) {
-                if (!/^[\d, \/]+$/.test(value)) return false;
-                var splittedDate = value.split('/');
-                if (splittedDate.length !== 3) return false;
-
-                var date = splittedDate[0],
-                    month = splittedDate[1],
-                    year = splittedDate[2];
-                if (!date || !month || !year || month < 1 || month > 12) {
-                    return false;
-                }
-                var dateCheck = new Date(year, month, 0).getDate();
-                if (date > dateCheck || date < 1) {
-                    return false;
-                }
-                var validDate = new Date(year, month - 1, date);
-                return validDate;
-            }
-
-            function doGetCaretPosition(elem) {
-                var caretPos = 0;
-                // IE Support
-                if (document.selection) {
-                    elem.focus();
-                    var sel = document.selection.createRange();
-                    sel.moveStart('character', -elem.value.length);
-                    caretPos = sel.text.length;
-                }
-                // Firefox support
-                else if (elem.selectionStart || elem.selectionStart == '0') {
-                        caretPos = elem.selectionStart;
-                    }
-
-                return caretPos;
-            }
-
-            function setCaretPosition(elem, caretPos) {
-                if (elem != null) {
-                    if (elem.createTextRange) {
-                        var range = elem.createTextRange();
-                        range.move('character', caretPos);
-                        range.select();
-                    } else {
-                        if (elem.selectionStart) {
-                            elem.focus();
-                            elem.setSelectionRange(caretPos, caretPos);
-                        } else {
-                            elem.focus();
-                        }
-                    }
-                }
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiInteger', uiInteger);
-
-    function uiInteger() {
-        return uiIntegerFilter;
-
-        ////////////////
-
-        function uiIntegerFilter(value) {
-            if (value === undefined || value === null) return null;
-            value = value.toString().replace(/\D+/g, '');
-            value = value ? parseInt(value) : null;
-            return value;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiInteger', uiInteger);
-
-    uiInteger.$inject = ['uiIntegerFilter'];
-
-    function uiInteger(uiIntegerFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel',
-            scope: {
-                uiIntegerDigitMax: '=?'
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = formatValue(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                return viewValue;
-            });
-            ctrl.$formatters.push(formatValue);
-            function formatValue(value) {
-                var newValue = uiIntegerFilter(value);
-                if (scope.uiIntegerDigitMax && typeof newValue === 'number') {
-                    var maxDigit = parseInt(scope.uiIntegerDigitMax);
-                    if (!isNaN(maxDigit)) {
-                        newValue = parseInt(newValue.toString().substring(0, maxDigit));
-                    }
-                }
-                return newValue;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiHour', uiHour);
-
-    function uiHour() {
-        return uiHourFilter;
-
-        ////////////////
-
-        function uiHourFilter(value) {
-            if (value === undefined || value === null) return null;
-
-            value = value.toString().substring(0, 2).replace(/\D+/g, '');
-            value = value ? parseInt(value) : null;
-            return value;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiHour.$inject = ["uiHourFilter"];
-    angular.module('smn-ui').directive('uiHour', uiHour);
-
-    function uiHour(uiHourFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel',
-            scope: {}
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = formatValue(value);
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                viewValue = /^([0-9]|1[0-9]|2[0-3])$/.test(viewValue) ? viewValue : undefined;
-                return viewValue;
-            });
-            ctrl.$formatters.push(formatValue);
-
-            function formatValue(value) {
-                return uiHourFilter(value);
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiDateFormat.$inject = ["$locale", "$filter"];
-    angular.module('smn-ui').directive('uiDateFormat', uiDateFormat);
-
-    function uiDateFormat($locale, $filter) {
-        var directive = {
-            require: '?ngModel',
-            link: link,
-            restrict: 'A'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            if (!ctrl) return;
-            ctrl.$formatters.push(function (value) {
-                value = $filter('date')(value, getDateMask());
-                ctrl.$modelValue = value;
-                return value;
-            });
-            ctrl.$parsers.push(function (value) {
-                if (!value) return null;
-                var validDate = checkDate(value);
-                if (validDate) {
-                    ctrl.$setValidity('date', true);
-                    return validDate;
-                }
-                ctrl.$setValidity('date', false);
-                return null;
-            });
-
-            function getDateMask() {
-                var mask = attrs.uiDateFormat || 'shortDate',
-                    formats = $locale.DATETIME_FORMATS;
-                var dateMask = mask in formats ? formats[mask] : mask;
-                return dateMask;
-            }
-
-            function checkDate(value) {
-                if (!/^[\d, \/]+$/.test(value)) return false;
-                var splittedDate = value.split('/');
-                if (splittedDate.length !== 3) return false;
-                var dayIndex, monthIndex, yearIndex;
-
-                var mask = getDateMask();
-                mask = mask.split('/');
-                for (var i = 0; i < 3; i++) {
-                    if (mask[i].indexOf('d') > -1) dayIndex = i;
-                    if (mask[i].indexOf('M') > -1) monthIndex = i;
-                    if (mask[i].indexOf('y') > -1) yearIndex = i;
-                }
-
-                if (isNaN(dayIndex) || isNaN(monthIndex) || isNaN(yearIndex)) return false;
-
-                var date = splittedDate[dayIndex],
-                    month = splittedDate[monthIndex],
-                    year = splittedDate[yearIndex];
-                if (!date || !month || !year) return false;
-                if (month < 1 || month > 12) {
-                    return false;
-                }
-                var dateCheck = new Date(year, month, 0).getDate();
-                if (date > dateCheck || date < 1) return false;
-                var validDate = new Date(year, month - 1, date);
-                return validDate;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
   'use strict';
 
   angular.module('smn-ui').component('uiSwitch', {
@@ -1991,6 +1561,25 @@
     $ctrl.$postLink = function () {
       $element.wrapInner('<label></label>');
       $element.find('input').addClass('ui-switch').after('<div class="switch-cover"><div class="track"></div><div class="thumb-container"><div class="thumb"></div></div></div>');
+    };
+  }
+})();
+'use strict';
+
+(function () {
+  'use strict';
+
+  angular.module('smn-ui').component('uiOption', {
+    controller: uiOptionController
+  });
+
+  uiOptionController.$inject = ['$element'];
+
+  function uiOptionController($element) {
+    var $ctrl = this;
+    $ctrl.$postLink = function () {
+      $element.wrapInner('<label></label>');
+      $element.find('input').addClass('ui-option').after('<div class="ui-option-shell"><div class="ui-option-fill"></div><div class="ui-option-mark"></div></div>');
     };
   }
 })();
@@ -2015,25 +1604,6 @@
             $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
         };
     }
-})();
-'use strict';
-
-(function () {
-  'use strict';
-
-  angular.module('smn-ui').component('uiOption', {
-    controller: uiOptionController
-  });
-
-  uiOptionController.$inject = ['$element'];
-
-  function uiOptionController($element) {
-    var $ctrl = this;
-    $ctrl.$postLink = function () {
-      $element.wrapInner('<label></label>');
-      $element.find('input').addClass('ui-option').after('<div class="ui-option-shell"><div class="ui-option-fill"></div><div class="ui-option-mark"></div></div>');
-    };
-  }
 })();
 'use strict';
 
@@ -2336,6 +1906,436 @@
 (function () {
     'use strict';
 
+    angular.module('smn-ui').filter('uiMinute', uiMinute);
+
+    function uiMinute() {
+        return uiMinuteFilter;
+
+        ////////////////
+
+        function uiMinuteFilter(value) {
+            if (value === undefined || value === null) return null;
+
+            value = value.toString().substring(0, 2).replace(/\D+/g, '');
+            value = value ? parseInt(value) : null;
+            return value;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiMinute.$inject = ["uiMinuteFilter"];
+    angular.module('smn-ui').directive('uiMinute', uiMinute);
+
+    function uiMinute(uiMinuteFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel',
+            scope: {}
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = formatValue(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                viewValue = /^([0-9]|[1-4][0-9]|5[0-9])$/.test(viewValue) ? viewValue : undefined;
+                return viewValue;
+            });
+            ctrl.$formatters.push(formatValue);
+
+            function formatValue(value) {
+                return uiMinuteFilter(value);
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
+
+    function uiMaxLength() {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: ['ngModel', '?^form'],
+            scope: {
+                uiMaxlength: '='
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            scope.$watch('uiMaxlength', function (value, oldValue) {
+                element.attr('maxlength', value);
+            });
+            // ctrl[0].$formatters.unshift(formatValue);
+            // ctrl[0].$parsers.unshift(formatValue);
+            function formatValue(value) {
+                if (!value || !scope.uiMaxLength) return value;
+                var newValue = value.toString();
+                var maxLength = parseInt(scope.uiMaxLength);
+                if (isNaN(maxLength)) return;
+                newValue = newValue.substring(0, maxLength);
+                var isModelPristine = ctrl[0].$pristine,
+                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
+                ctrl[0].$setViewValue(newValue);
+                ctrl[0].$render();
+                isModelPristine && ctrl[0].$setPristine();
+                isFormPristine && ctrl[1].$setPristine();
+                return newValue;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiMaskDate.$inject = ["$filter", "$timeout"];
+    angular.module('smn-ui').directive('uiMaskDate', uiMaskDate);
+
+    function uiMaskDate($filter, $timeout) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel',
+            scope: {
+                uiMaxDate: '=',
+                uiMinDate: '='
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            var beforeSelIndex, afterSelIndex, futureSelIndex;
+
+            element.on('keydown', function () {
+                beforeSelIndex = doGetCaretPosition(element[0]);
+            });
+
+            ctrl.$parsers.push(function (value) {
+                afterSelIndex = doGetCaretPosition(element[0]);
+
+                var viewValue = formatDate(ctrl.$viewValue);
+                var check = checkDate(viewValue);
+
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+
+                if (element[0].selectionStart || element[0].selectionStart == '0') {
+                    switch (true) {
+                        case beforeSelIndex == 2 && afterSelIndex == 3:
+                            futureSelIndex = 4;
+                            break;
+                        case beforeSelIndex == 5 && afterSelIndex == 6:
+                            futureSelIndex = 7;
+                            break;
+                        default:
+                            futureSelIndex = afterSelIndex;
+                    }
+                    setCaretPosition(element[0], futureSelIndex);
+                    $timeout(function () {
+                        setCaretPosition(element[0], futureSelIndex);
+                    });
+                }
+
+                if (viewValue.length === 10 && check) {
+                    var dateArray = viewValue.split('/');
+
+                    ctrl.$setValidity('max', !(scope.uiMaxDate && scope.uiMaxDate < check));
+                    ctrl.$setValidity('min', !(scope.uiMinDate && scope.uiMinDate > check));
+
+                    return new Date(dateArray[2], dateArray[1] - 1, dateArray[0]);
+                }
+
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                return $filter('date')(value, 'dd/MM/yyyy');
+            });
+
+            scope.$watch('uiMaxDate', function () {
+                var viewValue = formatDate(ctrl.$viewValue);
+                var check = checkDate(viewValue);
+
+                ctrl.$setValidity('max', true);
+                if (check && scope.uiMinDate) ctrl.$setValidity('max', !(scope.uiMaxDate < check));
+            });
+
+            scope.$watch('uiMinDate', function () {
+                var viewValue = formatDate(ctrl.$viewValue);
+                var check = checkDate(viewValue);
+
+                ctrl.$setValidity('min', true);
+                if (check && scope.uiMinDate) ctrl.$setValidity('min', scope.uiMinDate <= check);
+            });
+
+            function formatDate(date) {
+                if (!date) return '';
+                date = date.replace(/[^0-9]+/g, '');
+                if (date.length > 2) date = date.substring(0, 2) + '/' + date.substring(2);
+                if (date.length > 5) date = date.substring(0, 5) + '/' + date.substring(5, 9);
+                return date;
+            }
+
+            function checkDate(value) {
+                if (!/^[\d, \/]+$/.test(value)) return false;
+                var splittedDate = value.split('/');
+                if (splittedDate.length !== 3) return false;
+
+                var date = splittedDate[0],
+                    month = splittedDate[1],
+                    year = splittedDate[2];
+                if (!date || !month || !year || month < 1 || month > 12) {
+                    return false;
+                }
+                var dateCheck = new Date(year, month, 0).getDate();
+                if (date > dateCheck || date < 1) {
+                    return false;
+                }
+                var validDate = new Date(year, month - 1, date);
+                return validDate;
+            }
+
+            function doGetCaretPosition(elem) {
+                var caretPos = 0;
+                // IE Support
+                if (document.selection) {
+                    elem.focus();
+                    var sel = document.selection.createRange();
+                    sel.moveStart('character', -elem.value.length);
+                    caretPos = sel.text.length;
+                }
+                // Firefox support
+                else if (elem.selectionStart || elem.selectionStart == '0') {
+                        caretPos = elem.selectionStart;
+                    }
+
+                return caretPos;
+            }
+
+            function setCaretPosition(elem, caretPos) {
+                if (elem != null) {
+                    if (elem.createTextRange) {
+                        var range = elem.createTextRange();
+                        range.move('character', caretPos);
+                        range.select();
+                    } else {
+                        if (elem.selectionStart) {
+                            elem.focus();
+                            elem.setSelectionRange(caretPos, caretPos);
+                        } else {
+                            elem.focus();
+                        }
+                    }
+                }
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiHour', uiHour);
+
+    function uiHour() {
+        return uiHourFilter;
+
+        ////////////////
+
+        function uiHourFilter(value) {
+            if (value === undefined || value === null) return null;
+
+            value = value.toString().substring(0, 2).replace(/\D+/g, '');
+            value = value ? parseInt(value) : null;
+            return value;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiHour.$inject = ["uiHourFilter"];
+    angular.module('smn-ui').directive('uiHour', uiHour);
+
+    function uiHour(uiHourFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel',
+            scope: {}
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = formatValue(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                viewValue = /^([0-9]|1[0-9]|2[0-3])$/.test(viewValue) ? viewValue : undefined;
+                return viewValue;
+            });
+            ctrl.$formatters.push(formatValue);
+
+            function formatValue(value) {
+                return uiHourFilter(value);
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiInteger', uiInteger);
+
+    function uiInteger() {
+        return uiIntegerFilter;
+
+        ////////////////
+
+        function uiIntegerFilter(value) {
+            if (value === undefined || value === null) return null;
+            value = value.toString().replace(/\D+/g, '');
+            value = value ? parseInt(value) : null;
+            return value;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiInteger', uiInteger);
+
+    uiInteger.$inject = ['uiIntegerFilter'];
+
+    function uiInteger(uiIntegerFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel',
+            scope: {
+                uiIntegerDigitMax: '=?'
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = formatValue(value);
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                return viewValue;
+            });
+            ctrl.$formatters.push(formatValue);
+            function formatValue(value) {
+                var newValue = uiIntegerFilter(value);
+                if (scope.uiIntegerDigitMax && typeof newValue === 'number') {
+                    var maxDigit = parseInt(scope.uiIntegerDigitMax);
+                    if (!isNaN(maxDigit)) {
+                        newValue = parseInt(newValue.toString().substring(0, maxDigit));
+                    }
+                }
+                return newValue;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiDateFormat.$inject = ["$locale", "$filter"];
+    angular.module('smn-ui').directive('uiDateFormat', uiDateFormat);
+
+    function uiDateFormat($locale, $filter) {
+        var directive = {
+            require: '?ngModel',
+            link: link,
+            restrict: 'A'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            if (!ctrl) return;
+            ctrl.$formatters.push(function (value) {
+                value = $filter('date')(value, getDateMask());
+                ctrl.$modelValue = value;
+                return value;
+            });
+            ctrl.$parsers.push(function (value) {
+                if (!value) return null;
+                var validDate = checkDate(value);
+                if (validDate) {
+                    ctrl.$setValidity('date', true);
+                    return validDate;
+                }
+                ctrl.$setValidity('date', false);
+                return null;
+            });
+
+            function getDateMask() {
+                var mask = attrs.uiDateFormat || 'shortDate',
+                    formats = $locale.DATETIME_FORMATS;
+                var dateMask = mask in formats ? formats[mask] : mask;
+                return dateMask;
+            }
+
+            function checkDate(value) {
+                if (!/^[\d, \/]+$/.test(value)) return false;
+                var splittedDate = value.split('/');
+                if (splittedDate.length !== 3) return false;
+                var dayIndex, monthIndex, yearIndex;
+
+                var mask = getDateMask();
+                mask = mask.split('/');
+                for (var i = 0; i < 3; i++) {
+                    if (mask[i].indexOf('d') > -1) dayIndex = i;
+                    if (mask[i].indexOf('M') > -1) monthIndex = i;
+                    if (mask[i].indexOf('y') > -1) yearIndex = i;
+                }
+
+                if (isNaN(dayIndex) || isNaN(monthIndex) || isNaN(yearIndex)) return false;
+
+                var date = splittedDate[dayIndex],
+                    month = splittedDate[monthIndex],
+                    year = splittedDate[yearIndex];
+                if (!date || !month || !year) return false;
+                if (month < 1 || month > 12) {
+                    return false;
+                }
+                var dateCheck = new Date(year, month, 0).getDate();
+                if (date > dateCheck || date < 1) return false;
+                var validDate = new Date(year, month - 1, date);
+                return validDate;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     angular.module('smn-ui').filter('uiUnaccent', uiUnaccent);
 
     function uiUnaccent() {
@@ -2409,38 +2409,6 @@
             return angular.isString(value) && value.length > 0 ? value[0].toUpperCase() + value.substr(1).toLowerCase() : value;
         }
     }
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
-	angular.module('smn-ui').factory('uiWindow', uiWindow);
-
-	uiWindow.$inject = ['$window', '$rootScope'];
-
-	function uiWindow($window, $rootScope) {
-		var service = {};
-
-		angular.element($window).bind('scroll', function () {
-			$rootScope.$apply(getWindowScroll);
-		});
-
-		angular.element($window).bind('resize', function () {
-			$rootScope.$apply(getWindowScroll);
-		});
-
-		function getWindowScroll() {
-			service.scrollX = $window.scrollX;
-			service.scrollY = $window.scrollY;
-			service.innerWidth = $window.innerWidth;
-			service.innerHeight = $window.innerHeight;
-		}
-
-		getWindowScroll();
-
-		return service;
-	}
 })();
 'use strict';
 
@@ -2544,6 +2512,38 @@
 				event.preventDefault();
 			}
 		}
+	}
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
+	angular.module('smn-ui').factory('uiWindow', uiWindow);
+
+	uiWindow.$inject = ['$window', '$rootScope'];
+
+	function uiWindow($window, $rootScope) {
+		var service = {};
+
+		angular.element($window).bind('scroll', function () {
+			$rootScope.$apply(getWindowScroll);
+		});
+
+		angular.element($window).bind('resize', function () {
+			$rootScope.$apply(getWindowScroll);
+		});
+
+		function getWindowScroll() {
+			service.scrollX = $window.scrollX;
+			service.scrollY = $window.scrollY;
+			service.innerWidth = $window.innerWidth;
+			service.innerHeight = $window.innerHeight;
+		}
+
+		getWindowScroll();
+
+		return service;
 	}
 })();
 'use strict';
@@ -3012,51 +3012,6 @@
 'use strict';
 
 (function () {
-	'use strict';
-
-	angular.module('smn-ui').directive('uiProfileFloat', uiProfileFloat);
-
-	uiProfileFloat.$inject = ['$templateCache', '$interval'];
-
-	function uiProfileFloat($templateCache, $interval) {
-		var directive = {
-			restrict: 'E',
-			scope: {
-				src: '='
-			},
-			transclude: true,
-			template:'<div ng-if="!src" ng-transclude></div><img ng-src="{{src}}" ng-if="src" ng-style="{\'max-width\': !higherWidth ? \'100%\' : \'\', \'max-height\': higherWidth ? \'100%\' : \'\'}">',
-			link: link
-		};
-		return directive;
-
-		function link(scope, element) {
-			var loaded = false,
-			    img = element.find('img'),
-			    wait;
-			scope.$watch('src', function (value) {
-				if (!value) return;
-				wait = $interval(function () {
-					if (loaded) $interval.cancel(wait);
-					scope.higherWidth = !img[0] || img[0].naturalWidth > img[0].naturalHeight;
-				}, 0);
-			});
-			img.on('load', function (e) {
-				scope.$apply(function () {
-					loaded = true;
-				});
-			});
-			img.on('error', function (e) {
-				scope.$apply(function () {
-					loaded = true;
-				});
-			});
-		}
-	}
-})();
-'use strict';
-
-(function () {
     'use strict';
 
     angular.module('smn-ui').directive('uiMultiHandle', uiMultiHandle);
@@ -3215,6 +3170,51 @@
 (function () {
 	'use strict';
 
+	angular.module('smn-ui').directive('uiProfileFloat', uiProfileFloat);
+
+	uiProfileFloat.$inject = ['$templateCache', '$interval'];
+
+	function uiProfileFloat($templateCache, $interval) {
+		var directive = {
+			restrict: 'E',
+			scope: {
+				src: '='
+			},
+			transclude: true,
+			template:'<div ng-if="!src" ng-transclude></div><img ng-src="{{src}}" ng-if="src" ng-style="{\'max-width\': !higherWidth ? \'100%\' : \'\', \'max-height\': higherWidth ? \'100%\' : \'\'}">',
+			link: link
+		};
+		return directive;
+
+		function link(scope, element) {
+			var loaded = false,
+			    img = element.find('img'),
+			    wait;
+			scope.$watch('src', function (value) {
+				if (!value) return;
+				wait = $interval(function () {
+					if (loaded) $interval.cancel(wait);
+					scope.higherWidth = !img[0] || img[0].naturalWidth > img[0].naturalHeight;
+				}, 0);
+			});
+			img.on('load', function (e) {
+				scope.$apply(function () {
+					loaded = true;
+				});
+			});
+			img.on('error', function (e) {
+				scope.$apply(function () {
+					loaded = true;
+				});
+			});
+		}
+	}
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
 	angular.module('smn-ui').directive('uiFloatingCard', uiFloatingCardDirective);
 
 	uiFloatingCardDirective.$inject = ['$templateCache'];
@@ -3261,7 +3261,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 				'itemDefault': '@',
 				'labelList': '@',
 				'change': '=',
-				'click': '='
+				'click': '=',
+				'invalidValue': '@'
 			},
 			template: '<ui-input-container><input autocomplete="off" placeholder="{{placeholderList}}" ng-change="selected()" list="{{idList}}" ng-model="choosen"><datalist id="{{idList}}"><option ng-repeat="opt in list">{{opt[config.option]}}</option></datalist><label>{{labelList}}</label></ui-input-container>',
 			link: function link(scope, element, attrs, ngModel) {
@@ -3286,7 +3287,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 						return obj[scope.config.option] == scope.choosen;
 					})[0];
 
-					var rtn = !scope.attrList ? itemSelected || null : itemSelected ? itemSelected[scope.attrList] : null;
+					var rtn = !scope.attrList ? itemSelected || null : itemSelected ? itemSelected[scope.attrList] : scope.invalidValue ? scope.choosen : null;
 					ngModel.$setViewValue(rtn);
 					scope.change && scope.change(rtn);
 				};
