@@ -670,96 +670,6 @@
 (function () {
     'use strict';
 
-    uiMaskCpf.$inject = ["uiCpfFilter"];
-    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
-
-    function uiMaskCpf(uiCpfFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = uiCpfFilter(value);
-                ctrl.$setValidity('cpf', isValidCpf(viewValue));
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                value = typeof value == 'number' ? value.toString() : value;
-                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
-                return uiCpfFilter(value);
-            });
-
-            function isValidCpf(cpf) {
-                if (!cpf) return true;
-
-                if (cpf.length >= 14) {
-                    var valid = true;
-
-                    cpf = cpf.replace(/[^\d]+/g, '');
-
-                    if (cpf.length != 11) valid = false;
-
-                    var sum;
-                    var rest;
-                    sum = 0;
-                    if (cpf == "00000000000" || cpf == "11111111111" || cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" || cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" || cpf == "88888888888" || cpf == "99999999999") valid = false;
-
-                    for (var i = 1; i <= 9; i++) {
-                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
-                    }rest = sum * 10 % 11;
-
-                    if (rest == 10 || rest == 11) rest = 0;
-                    if (rest != parseInt(cpf.substring(9, 10))) valid = false;
-
-                    sum = 0;
-                    for (var i = 1; i <= 10; i++) {
-                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
-                    }rest = sum * 10 % 11;
-
-                    if (rest == 10 || rest == 11) rest = 0;
-                    if (rest != parseInt(cpf.substring(10, 11))) valid = false;
-
-                    if (!valid) return false;
-                }
-                return true;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCpf', uiCpf);
-
-    function uiCpf() {
-        return uiCpfFilter;
-
-        function uiCpfFilter(cpf) {
-            if (!cpf) return '';
-            cpf = cpf.toString().replace(/[^0-9]+/g, '');
-            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
-            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
-            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
-            if (cpf.length > 14) cpf = cpf.substring(0, 14);
-            return cpf;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     uiMaskCnpj.$inject = ["uiCnpjFilter", "$timeout"];
     angular.module('smn-ui').directive('uiMaskCnpj', uiMaskCnpj);
 
@@ -915,6 +825,96 @@
             if (cnpj.length > 15) cnpj = cnpj.substring(0, 15) + '-' + cnpj.substring(15);
             if (cnpj.length > 18) cnpj = cnpj.substring(0, 18);
             return cnpj;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    uiMaskCpf.$inject = ["uiCpfFilter"];
+    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
+
+    function uiMaskCpf(uiCpfFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = uiCpfFilter(value);
+                ctrl.$setValidity('cpf', isValidCpf(viewValue));
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                value = typeof value == 'number' ? value.toString() : value;
+                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
+                return uiCpfFilter(value);
+            });
+
+            function isValidCpf(cpf) {
+                if (!cpf) return true;
+
+                if (cpf.length >= 14) {
+                    var valid = true;
+
+                    cpf = cpf.replace(/[^\d]+/g, '');
+
+                    if (cpf.length != 11) valid = false;
+
+                    var sum;
+                    var rest;
+                    sum = 0;
+                    if (cpf == "00000000000" || cpf == "11111111111" || cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" || cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" || cpf == "88888888888" || cpf == "99999999999") valid = false;
+
+                    for (var i = 1; i <= 9; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(9, 10))) valid = false;
+
+                    sum = 0;
+                    for (var i = 1; i <= 10; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(10, 11))) valid = false;
+
+                    if (!valid) return false;
+                }
+                return true;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCpf', uiCpf);
+
+    function uiCpf() {
+        return uiCpfFilter;
+
+        function uiCpfFilter(cpf) {
+            if (!cpf) return '';
+            cpf = cpf.toString().replace(/[^0-9]+/g, '');
+            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
+            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
+            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
+            if (cpf.length > 14) cpf = cpf.substring(0, 14);
+            return cpf;
         }
     }
 })();
@@ -3239,6 +3239,94 @@
 			});
 		}
 	}
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiFilter', uiFilter);
+
+    uiFilter.$inject = ['$timeout', '$filter'];
+    function uiFilter($timeout, $filter) {
+        var directive = {
+            link: link,
+            restrict: 'AE',
+            transclude: true,
+            scope: {
+                'labelFilter': '@',
+                'ngModel': '=',
+                'modelSearch': '@',
+                'modelId': '@',
+                'list': '=',
+                'itemName': '@',
+                'requiredFilter': '='
+            },
+            require: 'ngModel',
+            template:'<ui-input-container ng-form="formFilter"><input type="text" ng-model="ngModelFilter" id="inputFilter" ng-required="requiredFilter ? true : false"> <label>{{labelFilter}}</label><ng-messages class="ui-error-message" for="formFilter.$error"><ng-message when="differentItem" style="padding-top: 4px; position: absolute">Insira um item presente na lista</ng-message></ng-messages><ul id="listFilter" class="ui-list-filter"><li class="ui-item-filter" ng-repeat="obj in list | filter: filter()" ng-click="select(obj);">{{ obj[itemName] }}</li></ul></ui-input-container>'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ngModelController) {
+            activate();
+
+            function activate() {
+                scope.filter = filter;
+                scope.select = select;
+
+                document.getElementById('inputFilter').onfocus = onFocus;
+                window.onclick = onBlur;
+            }
+
+            function close(obj) {
+                document.getElementById('listFilter').classList.remove('ui-list-filter-open');
+                $timeout(function () {
+                    var different = true;
+                    scope.list.forEach(function (obj) {
+                        if (scope.ngModelFilter == obj[scope.itemName]) {
+                            different = false;
+                        }
+                    });
+
+                    if (different && scope.ngModelFilter) {
+                        scope.ngModelFilter = '';
+                        if (scope.requiredFilter !== undefined && scope.requiredFilter) {
+                            scope.formFilter.$setValidity('differentItem', false);
+                        }
+                    } else {
+                        scope.formFilter.$setValidity('differentItem', true);
+                    }
+                    if (!scope.ngModelFilter) {
+                        scope.ngModel = null;
+                    }
+                }, 50);
+            }
+
+            function filter() {
+                var obj = {};
+                obj[scope.modelSearch] = scope.ngModelFilter;
+                return obj;
+            }
+
+            function select(obj) {
+                scope.ngModel = obj[scope.modelId] || obj;
+                scope.ngModelFilter = obj[scope.itemName];
+                close();
+            }
+
+            function onFocus() {
+                document.getElementById('listFilter').classList.add('ui-list-filter-open');
+            }
+
+            function onBlur(e) {
+                if (document.getElementById('listFilter') && document.getElementById('inputFilter') && e.target != document.getElementById('listFilter') && e.target != document.getElementById('inputFilter')) {
+                    scope.$apply(function () {
+                        close();
+                    });
+                }
+            }
+        }
+    };
 })();
 'use strict';
 
