@@ -670,6 +670,96 @@
 (function () {
     'use strict';
 
+    uiMaskCpf.$inject = ["uiCpfFilter"];
+    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
+
+    function uiMaskCpf(uiCpfFilter) {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: 'ngModel'
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            ctrl.$parsers.push(function (value) {
+                var viewValue = uiCpfFilter(value);
+                ctrl.$setValidity('cpf', isValidCpf(viewValue));
+                ctrl.$setViewValue(viewValue);
+                ctrl.$render();
+                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
+                if (!viewValue) return '';
+            });
+
+            ctrl.$formatters.push(function (value) {
+                value = typeof value == 'number' ? value.toString() : value;
+                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
+                return uiCpfFilter(value);
+            });
+
+            function isValidCpf(cpf) {
+                if (!cpf) return true;
+
+                if (cpf.length >= 14) {
+                    var valid = true;
+
+                    cpf = cpf.replace(/[^\d]+/g, '');
+
+                    if (cpf.length != 11) valid = false;
+
+                    var sum;
+                    var rest;
+                    sum = 0;
+                    if (cpf == "00000000000" || cpf == "11111111111" || cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" || cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" || cpf == "88888888888" || cpf == "99999999999") valid = false;
+
+                    for (var i = 1; i <= 9; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(9, 10))) valid = false;
+
+                    sum = 0;
+                    for (var i = 1; i <= 10; i++) {
+                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+                    }rest = sum * 10 % 11;
+
+                    if (rest == 10 || rest == 11) rest = 0;
+                    if (rest != parseInt(cpf.substring(10, 11))) valid = false;
+
+                    if (!valid) return false;
+                }
+                return true;
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').filter('uiCpf', uiCpf);
+
+    function uiCpf() {
+        return uiCpfFilter;
+
+        function uiCpfFilter(cpf) {
+            if (!cpf) return '';
+            cpf = cpf.toString().replace(/[^0-9]+/g, '');
+            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
+            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
+            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
+            if (cpf.length > 14) cpf = cpf.substring(0, 14);
+            return cpf;
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
     uiMaskCnpj.$inject = ["uiCnpjFilter", "$timeout"];
     angular.module('smn-ui').directive('uiMaskCnpj', uiMaskCnpj);
 
@@ -825,96 +915,6 @@
             if (cnpj.length > 15) cnpj = cnpj.substring(0, 15) + '-' + cnpj.substring(15);
             if (cnpj.length > 18) cnpj = cnpj.substring(0, 18);
             return cnpj;
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    uiMaskCpf.$inject = ["uiCpfFilter"];
-    angular.module('smn-ui').directive('uiMaskCpf', uiMaskCpf);
-
-    function uiMaskCpf(uiCpfFilter) {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: 'ngModel'
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            ctrl.$parsers.push(function (value) {
-                var viewValue = uiCpfFilter(value);
-                ctrl.$setValidity('cpf', isValidCpf(viewValue));
-                ctrl.$setViewValue(viewValue);
-                ctrl.$render();
-                if (viewValue.length === 14) return viewValue.replace(/[^0-9]+/g, '');
-                if (!viewValue) return '';
-            });
-
-            ctrl.$formatters.push(function (value) {
-                value = typeof value == 'number' ? value.toString() : value;
-                if (value) value = ("00000000000" + value).substring(11 + value.length - 11);
-                return uiCpfFilter(value);
-            });
-
-            function isValidCpf(cpf) {
-                if (!cpf) return true;
-
-                if (cpf.length >= 14) {
-                    var valid = true;
-
-                    cpf = cpf.replace(/[^\d]+/g, '');
-
-                    if (cpf.length != 11) valid = false;
-
-                    var sum;
-                    var rest;
-                    sum = 0;
-                    if (cpf == "00000000000" || cpf == "11111111111" || cpf == "22222222222" || cpf == "33333333333" || cpf == "44444444444" || cpf == "55555555555" || cpf == "66666666666" || cpf == "77777777777" || cpf == "88888888888" || cpf == "99999999999") valid = false;
-
-                    for (var i = 1; i <= 9; i++) {
-                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
-                    }rest = sum * 10 % 11;
-
-                    if (rest == 10 || rest == 11) rest = 0;
-                    if (rest != parseInt(cpf.substring(9, 10))) valid = false;
-
-                    sum = 0;
-                    for (var i = 1; i <= 10; i++) {
-                        sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
-                    }rest = sum * 10 % 11;
-
-                    if (rest == 10 || rest == 11) rest = 0;
-                    if (rest != parseInt(cpf.substring(10, 11))) valid = false;
-
-                    if (!valid) return false;
-                }
-                return true;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').filter('uiCpf', uiCpf);
-
-    function uiCpf() {
-        return uiCpfFilter;
-
-        function uiCpfFilter(cpf) {
-            if (!cpf) return '';
-            cpf = cpf.toString().replace(/[^0-9]+/g, '');
-            if (cpf.length > 3) cpf = cpf.substring(0, 3) + '.' + cpf.substring(3);
-            if (cpf.length > 7) cpf = cpf.substring(0, 7) + '.' + cpf.substring(7);
-            if (cpf.length > 11) cpf = cpf.substring(0, 11) + '-' + cpf.substring(11);
-            if (cpf.length > 14) cpf = cpf.substring(0, 14);
-            return cpf;
         }
     }
 })();
@@ -1604,47 +1604,6 @@
 (function () {
     'use strict';
 
-    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
-
-    function uiMaxLength() {
-        var directive = {
-            restrict: 'A',
-            link: link,
-            require: ['ngModel', '?^form'],
-            scope: {
-                uiMaxlength: '='
-            }
-        };
-        return directive;
-
-        function link(scope, element, attrs, ctrl) {
-            scope.$watch('uiMaxlength', function (value, oldValue) {
-                element.attr('maxlength', value);
-            });
-            // ctrl[0].$formatters.unshift(formatValue);
-            // ctrl[0].$parsers.unshift(formatValue);
-            function formatValue(value) {
-                if (!value || !scope.uiMaxLength) return value;
-                var newValue = value.toString();
-                var maxLength = parseInt(scope.uiMaxLength);
-                if (isNaN(maxLength)) return;
-                newValue = newValue.substring(0, maxLength);
-                var isModelPristine = ctrl[0].$pristine,
-                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
-                ctrl[0].$setViewValue(newValue);
-                ctrl[0].$render();
-                isModelPristine && ctrl[0].$setPristine();
-                isFormPristine && ctrl[1].$setPristine();
-                return newValue;
-            }
-        }
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     uiMaskDate.$inject = ["$filter", "$timeout"];
     angular.module('smn-ui').directive('uiMaskDate', uiMaskDate);
 
@@ -1784,6 +1743,47 @@
                         }
                     }
                 }
+            }
+        }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiMaxlength', uiMaxLength);
+
+    function uiMaxLength() {
+        var directive = {
+            restrict: 'A',
+            link: link,
+            require: ['ngModel', '?^form'],
+            scope: {
+                uiMaxlength: '='
+            }
+        };
+        return directive;
+
+        function link(scope, element, attrs, ctrl) {
+            scope.$watch('uiMaxlength', function (value, oldValue) {
+                element.attr('maxlength', value);
+            });
+            // ctrl[0].$formatters.unshift(formatValue);
+            // ctrl[0].$parsers.unshift(formatValue);
+            function formatValue(value) {
+                if (!value || !scope.uiMaxLength) return value;
+                var newValue = value.toString();
+                var maxLength = parseInt(scope.uiMaxLength);
+                if (isNaN(maxLength)) return;
+                newValue = newValue.substring(0, maxLength);
+                var isModelPristine = ctrl[0].$pristine,
+                    isFormPristine = ctrl[1] ? ctrl[1].$pristine : false;
+                ctrl[0].$setViewValue(newValue);
+                ctrl[0].$render();
+                isModelPristine && ctrl[0].$setPristine();
+                isFormPristine && ctrl[1].$setPristine();
+                return newValue;
             }
         }
     }
@@ -2018,28 +2018,6 @@
 (function () {
     'use strict';
 
-    angular.module('smn-ui').component('uiInputContainer', {
-        controller: uiInputContainerController,
-        require: '?ngModel',
-        bindings: {
-            'ngModel': '=?'
-        }
-    });
-
-    uiInputContainerController.$inject = ['$element'];
-    function uiInputContainerController($element) {
-        var $ctrl = this;
-
-        $ctrl.$postLink = function () {
-            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
-        };
-    }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
     uiChipsController.$inject = ["$element", "$timeout"];
     angular.module('smn-ui').component('uiChips', {
         controller: uiChipsController,
@@ -2210,6 +2188,28 @@
                 }
             });
         }
+    }
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').component('uiInputContainer', {
+        controller: uiInputContainerController,
+        require: '?ngModel',
+        bindings: {
+            'ngModel': '=?'
+        }
+    });
+
+    uiInputContainerController.$inject = ['$element'];
+    function uiInputContainerController($element) {
+        var $ctrl = this;
+
+        $ctrl.$postLink = function () {
+            $element.children('select, input, textarea, ui-chips').addClass('ui-control').after('<div class="line"></div>');
+        };
     }
 })();
 'use strict';
@@ -2441,6 +2441,95 @@
 
 		return service;
 	}
+})();
+'use strict';
+
+(function () {
+    'use strict';
+
+    angular.module('smn-ui').directive('uiColorPicker', ["$timeout", function ($timeout) {
+        return {
+            restrict: 'E',
+            transclude: true,
+            require: ['^form', 'ngModel'],
+            scope: {
+                'ngModel': '=',
+                'uiId': '@',
+                'uiName': '@',
+                'uiClass': '=?',
+                'uiShape': '@',
+                'uiPrimaryInfo': '@',
+                'uiSelect': '&'
+            },
+            template:'<div><div class="ui-icon" ng-style="{\'width\': uiShape == \'round-rectangle\' && \'auto\'}"><div class="switch-color-preview ui-color{{uiShape && \' \' + uiShape}}" ng-class="{\'no-color\': !colorSelected}" ng-style="{\'background-color\': colorSelected ? colorSelected : \'#D01716\'}" data-color-range="300"></div></div><ui-input-container class="no-margin"><input type="text" ng-class="uiClass" name="{{uiName}}" ng-readonly="switchOpened" ng-pattern="/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/" class="txt-color-switch" ng-model="ngModel" ng-focus="switchOpen()" style="user-select: none" autocomplete="off" ng-style="{\'color\': uiShape == \'round-rectangle\' && \'transparent\'}"> <label>Cor</label></ui-input-container><div class="switch-color" ng-if="switchOpened"><div class="no-color" ng-click="setColorType(null)"></div><div ng-repeat="colorType in colorTypes" ng-class="colorClass(\'bg-\' + colorType + \'-500\')" ng-click="setColorType($event, colorType)"></div><div class="switch-var" ng-class="{\'ui-show\':colorTypeSelected}" ng-style="{\'top\': switchVarTop}" style="top: -47px;"><div class="ui-color {{colorTypeSelected != null ? \'bg-\' + colorTypeSelected + \'-\' + colorVariation : \'\'}}" ng-repeat="colorVariation in colorVariations" ng-class="{\'ui-show\':checkAccentColor(colorVariation)}" data-color-range="{{colorVariation}}" ng-click="selectColor($event)"></div><div class="arrow" ng-style="{\'margin-left\': switchVarArrowLeft}" style="margin-left: 57px;"></div></div></div></div>',
+            link: function link(scope, element, attrs, ctrls, transclude) {
+                // element.find('ui-form-transclude').replaceWith(transclude());
+                scope.colorTypes = ['red', 'pink', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue', 'cyan', 'teal', 'green', 'light-green', 'lime', 'yellow', 'amber', 'orange', 'deep-orange', 'brown', 'grey', 'blue-grey'];
+                scope.colorVariations = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', 'A100', 'A200', 'A400', 'A700'];
+                scope.switchOpened = false;
+                scope.colorTypeSelected = undefined;
+                scope.colorSelected = undefined;
+                scope.switchOpen = function () {
+                    scope.colorTypeSelected = undefined;
+                    scope.switchOpened = true;
+                };
+                scope.switchClose = function () {
+                    scope.switchOpened = false;
+                };
+                scope.switchVarTop = undefined;
+                scope.switchVarArrowLeft = undefined;
+                scope.setColorType = function ($event, color) {
+                    scope.colorTypeSelected = color;
+                    if (color == undefined) {
+                        scope.selectColor();
+                        return;
+                    }
+                    scope.switchVarTop = angular.element($event.currentTarget).offset().top - angular.element(element.find('.switch-color')).offset().top - 50;
+                    scope.switchVarArrowLeft = angular.element($event.currentTarget).offset().left - angular.element(element.find('.switch-color')).offset().left + angular.element($event.currentTarget).width() / 2 - 6;
+                };
+                scope.colorClass = function (color) {
+                    return color;
+                };
+                scope.checkAccentColor = function (variation) {
+                    if (scope.colorTypeSelected == 'brown' || scope.colorTypeSelected == 'grey' || scope.colorTypeSelected == 'blue-grey') {
+                        if (variation == 'A100' || variation == 'A200' || variation == 'A400' || variation == 'A700') return false;
+                    }
+                    return true;
+                };
+
+                angular.element(document).bind('mousedown focusin', function (e) {
+                    if (!angular.element(element).find(e.target).length && scope.switchOpened) {
+                        scope.switchClose();
+                        scope.$apply();
+                    }
+                });
+                scope.selectColor = function ($event) {
+                    scope.colorSelected = $event ? rgb2hex($($event.currentTarget).css('background-color')).toUpperCase() : undefined;
+                    ctrls[1].$setViewValue(scope.colorSelected ? scope.colorSelected : 'Nenhuma cor selecionada');
+                    ctrls[1].$render();
+                    ctrls[0][scope.uiName].$setDirty();
+                    scope.switchClose();
+                    $timeout(scope.uiSelect);
+                };
+
+                ctrls[1].$formatters.push(function (value) {
+                    scope.colorSelected = value;
+                    ctrls[1].$setViewValue(value ? value : 'Nenhuma cor selecionada');
+                    ctrls[0].$setPristine(); // Dentro do formatters, faz o campo nascer como pristine, caso contrÃ¡rio ele perde a propriedade
+                    return value;
+                });
+
+                function rgb2hex(rgb) {
+                    var hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+                    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+                    function hex(x) {
+                        return isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+                    }
+                    return '#' + (hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3])).toUpperCase();
+                }
+            }
+        };
+    }]);
 })();
 'use strict';
 
@@ -2754,25 +2843,6 @@
 (function () {
 	'use strict';
 
-	angular.module('smn-ui').component('uiSpinner', {
-		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
-		controller: uiSpinnerController
-	});
-
-	uiSpinnerController.$inject = ['$element'];
-	function uiSpinnerController($element) {
-		var $ctrl = this;
-
-		$ctrl.$onInit = function () {};
-		$ctrl.$onChanges = function (changesObj) {};
-		$ctrl.$onDestory = function () {};
-	}
-})();
-'use strict';
-
-(function () {
-	'use strict';
-
 	angular.module('smn-ui').provider('uiSnack', uiSnack);
 
 	uiSnack.$inject = [];
@@ -2896,6 +2966,25 @@
 		return directive;
 
 		function link(scope, element, attrs) {}
+	}
+})();
+'use strict';
+
+(function () {
+	'use strict';
+
+	angular.module('smn-ui').component('uiSpinner', {
+		template:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1" width="24px" height="24px" viewBox="0 0 28 28"><g class="ui-circular-loader"><path class="qp-circular-loader-path" fill="none" d="M 14,1.5 A 12.5,12.5 0 1 1 1.5,14"></path></g></svg>',
+		controller: uiSpinnerController
+	});
+
+	uiSpinnerController.$inject = ['$element'];
+	function uiSpinnerController($element) {
+		var $ctrl = this;
+
+		$ctrl.$onInit = function () {};
+		$ctrl.$onChanges = function (changesObj) {};
+		$ctrl.$onDestory = function () {};
 	}
 })();
 'use strict';
@@ -3260,10 +3349,11 @@
                 'modelId': '@',
                 'list': '=',
                 'itemName': '@',
-                'requiredFilter': '='
+                'requiredFilter': '=',
+                'clearButton': '='
             },
             require: 'ngModel',
-            template:'<ui-input-container ng-form="formFilter"><input type="text" ng-model="ngModelFilter" id="inputFilter" ng-required="requiredFilter ? true : false"> <label>{{labelFilter}}</label><ng-messages class="ui-error-message" for="formFilter.$error"><ng-message when="differentItem" style="padding-top: 4px; position: absolute">Insira um item presente na lista</ng-message></ng-messages><ul id="listFilter" class="ui-list-filter"><li class="ui-item-filter" ng-repeat="obj in list | filter: filter()" ng-click="select(obj);">{{ obj[itemName] }}</li></ul></ui-input-container>'
+            template:'<div class="ui-flex center"><ui-input-container ng-form="formFilter"><input type="text" ng-model="ngModelFilter" id="inputFilter" ng-required="requiredFilter ? true : false"> <label>{{labelFilter}}</label><ng-messages class="ui-error-message" for="formFilter.$error"><ng-message when="differentItem" style="padding-top: 4px; position: absolute">Insira um item presente na lista</ng-message></ng-messages><ul id="listFilter" class="ui-list-filter"><li class="ui-item-filter" ng-repeat="obj in list | filter: filter()" ng-click="select(obj);">{{ obj[itemName] }}</li></ul></ui-input-container><button ng-if="clearButton ? true : false" ng-click="clear()" type="button" class="ui-button icon xsmall flex-none"><i class="material-icons">close</i></button></div>'
         };
         return directive;
 
@@ -3273,6 +3363,7 @@
             function activate() {
                 scope.filter = filter;
                 scope.select = select;
+                scope.clear = clear;
 
                 document.getElementById('inputFilter').onfocus = onFocus;
                 window.onclick = onBlur;
@@ -3312,6 +3403,10 @@
                 scope.ngModel = obj[scope.modelId] || obj;
                 scope.ngModelFilter = obj[scope.itemName];
                 close();
+            }
+
+            function clear() {
+                scope.ngModelFilter = '';
             }
 
             function onFocus() {
@@ -3771,95 +3866,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
         });
     }
-})();
-'use strict';
-
-(function () {
-    'use strict';
-
-    angular.module('smn-ui').directive('uiColorPicker', ["$timeout", function ($timeout) {
-        return {
-            restrict: 'E',
-            transclude: true,
-            require: ['^form', 'ngModel'],
-            scope: {
-                'ngModel': '=',
-                'uiId': '@',
-                'uiName': '@',
-                'uiClass': '=?',
-                'uiShape': '@',
-                'uiPrimaryInfo': '@',
-                'uiSelect': '&'
-            },
-            template:'<div><div class="ui-icon" ng-style="{\'width\': uiShape == \'round-rectangle\' && \'auto\'}"><div class="switch-color-preview ui-color{{uiShape && \' \' + uiShape}}" ng-class="{\'no-color\': !colorSelected}" ng-style="{\'background-color\': colorSelected ? colorSelected : \'#D01716\'}" data-color-range="300"></div></div><ui-input-container class="no-margin"><input type="text" ng-class="uiClass" name="{{uiName}}" ng-readonly="switchOpened" ng-pattern="/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/" class="txt-color-switch" ng-model="ngModel" ng-focus="switchOpen()" style="user-select: none" autocomplete="off" ng-style="{\'color\': uiShape == \'round-rectangle\' && \'transparent\'}"> <label>Cor</label></ui-input-container><div class="switch-color" ng-if="switchOpened"><div class="no-color" ng-click="setColorType(null)"></div><div ng-repeat="colorType in colorTypes" ng-class="colorClass(\'bg-\' + colorType + \'-500\')" ng-click="setColorType($event, colorType)"></div><div class="switch-var" ng-class="{\'ui-show\':colorTypeSelected}" ng-style="{\'top\': switchVarTop}" style="top: -47px;"><div class="ui-color {{colorTypeSelected != null ? \'bg-\' + colorTypeSelected + \'-\' + colorVariation : \'\'}}" ng-repeat="colorVariation in colorVariations" ng-class="{\'ui-show\':checkAccentColor(colorVariation)}" data-color-range="{{colorVariation}}" ng-click="selectColor($event)"></div><div class="arrow" ng-style="{\'margin-left\': switchVarArrowLeft}" style="margin-left: 57px;"></div></div></div></div>',
-            link: function link(scope, element, attrs, ctrls, transclude) {
-                // element.find('ui-form-transclude').replaceWith(transclude());
-                scope.colorTypes = ['red', 'pink', 'purple', 'deep-purple', 'indigo', 'blue', 'light-blue', 'cyan', 'teal', 'green', 'light-green', 'lime', 'yellow', 'amber', 'orange', 'deep-orange', 'brown', 'grey', 'blue-grey'];
-                scope.colorVariations = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900', 'A100', 'A200', 'A400', 'A700'];
-                scope.switchOpened = false;
-                scope.colorTypeSelected = undefined;
-                scope.colorSelected = undefined;
-                scope.switchOpen = function () {
-                    scope.colorTypeSelected = undefined;
-                    scope.switchOpened = true;
-                };
-                scope.switchClose = function () {
-                    scope.switchOpened = false;
-                };
-                scope.switchVarTop = undefined;
-                scope.switchVarArrowLeft = undefined;
-                scope.setColorType = function ($event, color) {
-                    scope.colorTypeSelected = color;
-                    if (color == undefined) {
-                        scope.selectColor();
-                        return;
-                    }
-                    scope.switchVarTop = angular.element($event.currentTarget).offset().top - angular.element(element.find('.switch-color')).offset().top - 50;
-                    scope.switchVarArrowLeft = angular.element($event.currentTarget).offset().left - angular.element(element.find('.switch-color')).offset().left + angular.element($event.currentTarget).width() / 2 - 6;
-                };
-                scope.colorClass = function (color) {
-                    return color;
-                };
-                scope.checkAccentColor = function (variation) {
-                    if (scope.colorTypeSelected == 'brown' || scope.colorTypeSelected == 'grey' || scope.colorTypeSelected == 'blue-grey') {
-                        if (variation == 'A100' || variation == 'A200' || variation == 'A400' || variation == 'A700') return false;
-                    }
-                    return true;
-                };
-
-                angular.element(document).bind('mousedown focusin', function (e) {
-                    if (!angular.element(element).find(e.target).length && scope.switchOpened) {
-                        scope.switchClose();
-                        scope.$apply();
-                    }
-                });
-                scope.selectColor = function ($event) {
-                    scope.colorSelected = $event ? rgb2hex($($event.currentTarget).css('background-color')).toUpperCase() : undefined;
-                    ctrls[1].$setViewValue(scope.colorSelected ? scope.colorSelected : 'Nenhuma cor selecionada');
-                    ctrls[1].$render();
-                    ctrls[0][scope.uiName].$setDirty();
-                    scope.switchClose();
-                    $timeout(scope.uiSelect);
-                };
-
-                ctrls[1].$formatters.push(function (value) {
-                    scope.colorSelected = value;
-                    ctrls[1].$setViewValue(value ? value : 'Nenhuma cor selecionada');
-                    ctrls[0].$setPristine(); // Dentro do formatters, faz o campo nascer como pristine, caso contrÃ¡rio ele perde a propriedade
-                    return value;
-                });
-
-                function rgb2hex(rgb) {
-                    var hexDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-                    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-                    function hex(x) {
-                        return isNaN(x) ? '00' : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
-                    }
-                    return '#' + (hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3])).toUpperCase();
-                }
-            }
-        };
-    }]);
 })();
 'use strict';
 
