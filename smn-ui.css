@@ -3202,6 +3202,29 @@ ui-container.small {
   margin-bottom: 16px;
   color: rgba(0,0,0,0.6);
 }
+.ui-expand.ng-animate {
+  transition: 300ms ease-in-out;
+}
+
+.ui-expand.ng-hide {
+  transition: 600ms ease-in-out, width 300ms ease-in-out 150ms, height 300ms ease-in-out 150ms !important;
+}
+
+.ui-expand > * {
+  transition: 150ms ease-in-out;
+}
+
+.ui-expand.ng-hide-animate > * {
+  opacity: 0;
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+  transition: 150ms ease-in-out 300ms;
+}
+
+.ui-expand.ng-hide > * {
+  opacity: 0;
+  transition: 150ms ease-in-out;
+}
 .ui-fade-translate.ng-enter-prepare,
 .ui-fade-translate.ng-enter {
   opacity: 0;
@@ -3286,28 +3309,264 @@ ui-container.small {
   transform: scale(0);
   transition: none;
 }
-.ui-expand.ng-animate {
-  transition: 300ms ease-in-out;
+ui-color-picker {
+  width: 48px;
+  display: block;
+  position: relative;
 }
 
-.ui-expand.ng-hide {
-  transition: 600ms ease-in-out, width 300ms ease-in-out 150ms, height 300ms ease-in-out 150ms !important;
+ui-color-picker .ui-icon {
+  position: absolute;
+  top: 20px;
 }
 
-.ui-expand > * {
-  transition: 150ms ease-in-out;
+ui-color-picker .switch-color {
+  display: -webkit-box;
+  display: flex;
+  flex-wrap: wrap;
+  width: 200px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  padding: 3px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  margin: 0 auto;
+  box-sizing: content-box;
+  z-index: 1;
+  margin-top: 1px;
 }
 
-.ui-expand.ng-hide-animate > * {
+ui-color-picker .switch-color>*:not(.switch-var) {
+  min-width: 20%;
+  height: 40px;
+  transition: 200ms ease-in-out;
+  cursor: pointer;
+}
+
+ui-color-picker .switch-color>.no-color {
+  border: 3px solid #d01716;
+  background-color: white;
+  background-image: linear-gradient(45deg, white 46%, #d01716 48%, #d01716 52%, white 54%);
+}
+
+ui-color-picker .switch-var>*.ui-active {
+  -webkit-transform: scale(0.8);
+  transform: scale(0.8);
+}
+
+ui-color-picker .switch-var {
+  width: 300px;
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  margin-left: -150px;
+  background-color: white;
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  transition: 200ms ease-in-out;
+}
+
+ui-color-picker .switch-var:not(.ui-show) {
   opacity: 0;
-  -webkit-transform: translateY(-2px);
-  transform: translateY(-2px);
-  transition: 150ms ease-in-out 300ms;
+  margin-top: 10px;
+  visibility: hidden;
 }
 
-.ui-expand.ng-hide > * {
-  opacity: 0;
-  transition: 150ms ease-in-out;
+ui-color-picker .switch-var .arrow {
+  display: block;
+  position: absolute;
+  border-style: solid;
+  border-width: 6px 6px 0;
+  border-color: white transparent transparent;
+  left: 47px;
+  top: 100%;
+  width: 0;
+  transition: 200ms ease-in-out;
+}
+
+ui-color-picker .switch-var>* {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  transition: 200ms ease-in-out;
+}
+
+ui-color-picker .switch-var>*:not(.ui-show):not(.arrow) {
+  width: 0;
+}
+
+ui-color-picker .txt-color-switch {
+  cursor: pointer;
+}
+
+ui-color-picker .switch-color-preview {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: background-color 100ms ease-in-out;
+  border-radius: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+}
+
+ui-color-picker .switch-color-preview.no-color {
+  background-color: #d01716;
+}
+
+ui-color-picker .switch-color-preview::before {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 100%;
+  background-color: white;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  transition: 200ms ease-in-out;
+}
+
+ui-color-picker .switch-color-preview.no-color::before {
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+
+ui-color-picker .switch-color-preview::after {
+  content: '';
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  height: 0;
+  width: 0;
+  background-color: #d01716;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  transition: 100ms ease-in-out;
+}
+
+ui-color-picker .switch-color-preview.no-color::after {
+  height: 100%;
+  width: 3px;
+}
+
+ui-color-picker .switch-color-preview.round-rectangle {
+  width: 44px;
+  height: 22px;
+  border-radius: 5px;
+}
+
+ui-color-picker .switch-color-preview.round-rectangle::before {
+  width: 38px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+ui-color-picker .switch-color-preview.round-rectangle.no-color::after {
+  height: 150%;
+}
+ui-card {
+  display: block;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.2);
+  background-color: #FFF;
+  max-width: 100%;
+  border-radius: 2px;
+  transition: 200ms ease-in-out;
+}
+
+ui-card.no-space {
+  margin: 0;
+}
+
+ui-card.no-radius {
+  border-radius: 0;
+}
+
+ui-card.pointer {
+  cursor: pointer;
+}
+
+ui-card.hover:hover {
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.2);
+}
+
+ui-card-content {
+  display: block;
+  padding: 16px;
+}
+
+ui-card-title {
+  display: block;
+  font-size: 20px;
+  padding: 16px 16px 0;
+}
+
+.if-slide.ng-enter {
+  -webkit-transform: translateX(-100vw);
+  transform: translateX(-100vw);
+  max-height: 0;
+  transition: margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
+  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
+  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
+}
+
+.if-slide.ng-enter:not(.ng-enter-active) {
+  margin: 0 !important;
+}
+
+.if-slide.ng-enter-active {
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  max-height: 100vw;
+}
+
+.if-slide.ng-leave {
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  max-height: 100vw;
+  transition: margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
+  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5);
+  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
+}
+
+.if-slide.ng-leave-active {
+  -webkit-transform: translateX(100vw);
+  transform: translateX(100vw);
+  margin: 0 !important;
+  max-height: 0;
+}
+
+.if-slide.enter-right.ng-enter {
+  -webkit-transform: translateX(100vw);
+  transform: translateX(100vw);
+}
+
+.if-slide.enter-right.ng-enter-active {
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+}
+
+.if-slide.leave-left.ng-leave {
+  /*transform: translateX(0);*/
+}
+
+.if-slide.leave-left.ng-leave-active {
+  -webkit-transform: translateX(-100vw);
+  transform: translateX(-100vw);
 }
 ui-calendar {
   display: -webkit-inline-box;
@@ -3622,95 +3881,6 @@ ui-background-mask {
   display: block;
   z-index: 2000;
 }
-ui-card {
-  display: block;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.2);
-  background-color: #FFF;
-  max-width: 100%;
-  border-radius: 2px;
-  transition: 200ms ease-in-out;
-}
-
-ui-card.no-space {
-  margin: 0;
-}
-
-ui-card.no-radius {
-  border-radius: 0;
-}
-
-ui-card.pointer {
-  cursor: pointer;
-}
-
-ui-card.hover:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.2);
-}
-
-ui-card-content {
-  display: block;
-  padding: 16px;
-}
-
-ui-card-title {
-  display: block;
-  font-size: 20px;
-  padding: 16px 16px 0;
-}
-
-.if-slide.ng-enter {
-  -webkit-transform: translateX(-100vw);
-  transform: translateX(-100vw);
-  max-height: 0;
-  transition: margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
-  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
-  transition: transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, margin 150ms cubic-bezier(0, 0.5, 0.5, 1), max-height 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms, -webkit-transform 200ms cubic-bezier(0, 0.5, 0.5, 1) 100ms;
-}
-
-.if-slide.ng-enter:not(.ng-enter-active) {
-  margin: 0 !important;
-}
-
-.if-slide.ng-enter-active {
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
-  max-height: 100vw;
-}
-
-.if-slide.ng-leave {
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
-  max-height: 100vw;
-  transition: margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
-  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5);
-  transition: transform 200ms cubic-bezier(0.5, 0, 1, 0.5), margin 100ms cubic-bezier(0.5, 0, 1, 0.5) 200ms, max-height 200ms cubic-bezier(0.5, 0, 1, 0.5), -webkit-transform 200ms cubic-bezier(0.5, 0, 1, 0.5);
-}
-
-.if-slide.ng-leave-active {
-  -webkit-transform: translateX(100vw);
-  transform: translateX(100vw);
-  margin: 0 !important;
-  max-height: 0;
-}
-
-.if-slide.enter-right.ng-enter {
-  -webkit-transform: translateX(100vw);
-  transform: translateX(100vw);
-}
-
-.if-slide.enter-right.ng-enter-active {
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
-}
-
-.if-slide.leave-left.ng-leave {
-  /*transform: translateX(0);*/
-}
-
-.if-slide.leave-left.ng-leave-active {
-  -webkit-transform: translateX(-100vw);
-  transform: translateX(-100vw);
-}
 ui-menu {
   position: fixed;
   display: block;
@@ -3813,34 +3983,6 @@ ui-menu .title {
   color: rgba(0,0,0,0.7);
   padding: 10px;
 }
-.ui-list-filter {
-  transition: 0.2s;
-  position: absolute;
-  background-color: #fff;
-  border-radius: 2px;
-  width: 100%;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,.14), 0 4px 5px 0 rgba(0,0,0,.12), 0 1px 10px 0 rgba(0,0,0,.2);
-  max-height: 0;
-  overflow-y: scroll;
-  z-index: 3;
-}
-
-.ui-list-filter-open {
-  max-height: 135px;
-}
-
-.ui-item-filter {
-  padding: 8px;
-  font-size: 14px;
-  cursor: default;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ui-item-filter:hover {
-  background-color: rgba(0,0,0,.1);
-}
 ui-floating-card {
   display: -webkit-box;
   display: flex;
@@ -3915,156 +4057,33 @@ ui-floating-card.ng-leave-active ui-card {
 ui-floating-card ui-card-wrap {
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
-ui-multi-handle {
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  position: relative;
-  height: 16px;
-}
-
-ui-multi-handle .range-bar,
-ui-multi-handle .points {
+.ui-list-filter {
+  transition: 0.2s;
   position: absolute;
-  left: 0;
-  right: 0;
-}
-
-/*  Range Bar  */
-
-ui-multi-handle .range-bar {
-  background-color: #bdbdbd;
-  height: 2px;
-}
-
-/*  Points  */
-
-ui-multi-handle .points {
+  background-color: #fff;
+  border-radius: 2px;
   width: 100%;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: justify;
-  justify-content: space-between;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,.14), 0 4px 5px 0 rgba(0,0,0,.12), 0 1px 10px 0 rgba(0,0,0,.2);
+  max-height: 0;
+  overflow-y: scroll;
+  z-index: 3;
 }
 
-ui-multi-handle .point {
-  padding: 1px;
-  border-radius: 50%;
-  background-color: rgba(0,0,0,0.4);
+.ui-list-filter-open {
+  max-height: 135px;
 }
 
-/*  Range  */
-
-ui-multi-handle .range {
-  display: -webkit-box;
-  display: flex;
-  position: absolute;
-  left: 0;
-  transition: 150ms linear;
-  background-color: #f44336;
-  height: 2px;
-}
-
-ui-multi-handle .range.disabled {
-  background-color: #bdbdbd;
-}
-
-ui-multi-handle .start,
-ui-multi-handle .end {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: #f44336;
-  color: #FFF;
-  position: absolute;
-  transition: 300ms ease-in-out;
-  display: -webkit-box;
-  display: flex;
-  margin-top: -6px;
-}
-
-ui-multi-handle .range.disabled > div {
-  width: 10px;
-  height: 10px;
-  margin-top: -4px;
-  background-color: #bdbdbd;
-}
-
-ui-multi-handle .range > div::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  -webkit-transform: rotate(90deg) scale(0);
-  transform: rotate(90deg) scale(0);
-  z-index: -1;
-  border-top: 13px solid transparent;
-  border-bottom: 13px solid transparent;
-  border-left: 14px solid #F44336;
-  transition: all 200ms ease-in-out;
-}
-
-ui-multi-handle .range > div.active::before {
-  -webkit-transform: rotate(90deg) scale(1);
-  transform: rotate(90deg) scale(1);
-  bottom: -24px;
-  transition: all 200ms 100ms ease-in-out;
-}
-
-ui-multi-handle .range > div::after {
-  content: '';
-  display: block;
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  background-color: transparent;
-}
-
-ui-multi-handle .start {
-  left: 0;
-  -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
-}
-
-ui-multi-handle .range > div.active {
-  -webkit-transform: translate(-50%, -80%);
-  transform: translate(-50%, -80%);
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  margin-top: -16px;
-}
-
-ui-multi-handle .range .end.active {
-  -webkit-transform: translate(50%, -80%);
-  transform: translate(50%, -80%);
-}
-
-ui-multi-handle .end {
-  right: 0;
-  -webkit-transform: translateX(50%);
-  transform: translateX(50%);
-}
-
-ui-multi-handle .value {
-  font-size: 11px;
+.ui-item-filter {
+  padding: 8px;
+  font-size: 14px;
+  cursor: default;
   white-space: nowrap;
-  margin: auto;
-  transition: all 100ms ease-in-out;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-ui-multi-handle .value.ng-enter {
-  opacity: 0;
-}
-
-ui-multi-handle .value.ng-leave {
-  transition: none;
+.ui-item-filter:hover {
+  background-color: rgba(0,0,0,.1);
 }
 .ui-list {
   list-style-type: none;
@@ -4563,6 +4582,157 @@ ui-multi-handle .value.ng-leave {
     min-height: 60px;
   }
 }
+ui-multi-handle {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  position: relative;
+  height: 16px;
+}
+
+ui-multi-handle .range-bar,
+ui-multi-handle .points {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+/*  Range Bar  */
+
+ui-multi-handle .range-bar {
+  background-color: #bdbdbd;
+  height: 2px;
+}
+
+/*  Points  */
+
+ui-multi-handle .points {
+  width: 100%;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+}
+
+ui-multi-handle .point {
+  padding: 1px;
+  border-radius: 50%;
+  background-color: rgba(0,0,0,0.4);
+}
+
+/*  Range  */
+
+ui-multi-handle .range {
+  display: -webkit-box;
+  display: flex;
+  position: absolute;
+  left: 0;
+  transition: 150ms linear;
+  background-color: #f44336;
+  height: 2px;
+}
+
+ui-multi-handle .range.disabled {
+  background-color: #bdbdbd;
+}
+
+ui-multi-handle .start,
+ui-multi-handle .end {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #f44336;
+  color: #FFF;
+  position: absolute;
+  transition: 300ms ease-in-out;
+  display: -webkit-box;
+  display: flex;
+  margin-top: -6px;
+}
+
+ui-multi-handle .range.disabled > div {
+  width: 10px;
+  height: 10px;
+  margin-top: -4px;
+  background-color: #bdbdbd;
+}
+
+ui-multi-handle .range > div::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  -webkit-transform: rotate(90deg) scale(0);
+  transform: rotate(90deg) scale(0);
+  z-index: -1;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  border-left: 14px solid #F44336;
+  transition: all 200ms ease-in-out;
+}
+
+ui-multi-handle .range > div.active::before {
+  -webkit-transform: rotate(90deg) scale(1);
+  transform: rotate(90deg) scale(1);
+  bottom: -24px;
+  transition: all 200ms 100ms ease-in-out;
+}
+
+ui-multi-handle .range > div::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background-color: transparent;
+}
+
+ui-multi-handle .start {
+  left: 0;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+ui-multi-handle .range > div.active {
+  -webkit-transform: translate(-50%, -80%);
+  transform: translate(-50%, -80%);
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  margin-top: -16px;
+}
+
+ui-multi-handle .range .end.active {
+  -webkit-transform: translate(50%, -80%);
+  transform: translate(50%, -80%);
+}
+
+ui-multi-handle .end {
+  right: 0;
+  -webkit-transform: translateX(50%);
+  transform: translateX(50%);
+}
+
+ui-multi-handle .value {
+  font-size: 11px;
+  white-space: nowrap;
+  margin: auto;
+  transition: all 100ms ease-in-out;
+}
+
+ui-multi-handle .value.ng-enter {
+  opacity: 0;
+}
+
+ui-multi-handle .value.ng-leave {
+  transition: none;
+}
 ui-profile-float {
   width: 80px;
   height: 80px;
@@ -4712,6 +4882,99 @@ ui-slide > .stay-left {
   -webkit-transform: translate(-100%);
   transform: translate(-100%);
 }
+ui-snack-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: end;
+  justify-content: flex-end;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  z-index: 2000;
+}
+
+ui-snack-bar {
+  margin: 0 auto;
+  -webkit-box-flex: 0;
+  flex: 0 0 auto;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  background-color: #323232;
+  color: white;
+  padding: 14px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  border-radius: 2px;
+  min-width: 288px;
+  max-width: 568px;
+  transition: -webkit-transform 200ms ease-in-out;
+  transition: transform 200ms ease-in-out;
+  transition: transform 200ms ease-in-out, -webkit-transform 200ms ease-in-out;
+}
+
+@media (max-width: 568px) {
+  ui-snack-bar {
+    min-width: auto;
+    max-width: auto;
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+ui-snack-bar + ui-snack-bar {
+  margin-top: 10px;
+}
+
+ui-snack-bar .text {
+  -webkit-box-flex: 1;
+  flex: 1;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+ui-snack-bar .text:not(:last-child) {
+  padding-right: 48px;
+}
+
+ui-snack-bar button {
+  margin: -8px;
+  padding: 8px;
+  height: auto;
+  font-weight: 500;
+  color: #2196F3;
+}
+
+ui-snack-bar.ng-enter {
+  -webkit-transform: translateY(100%);
+  transform: translateY(100%);
+}
+
+ui-snack-bar.ng-enter-active {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+
+ui-snack-bar.ng-leave {
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+
+ui-snack-bar.ng-leave-active {
+  -webkit-transform: translateY(100%);
+  transform: translateY(100%);
+}
+
+ui-snack-bar + ui-snack-bar {
+  position: absolute;
+  transition-delay: 200ms;
+  visibility: hidden;
+}
 ui-spinner {
   display: inline-block;
   width: 24px;
@@ -4858,99 +5121,6 @@ ui-spinner.light path {
   100% {
     stroke: #666;
   }
-}
-ui-snack-container {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 0;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-pack: end;
-  justify-content: flex-end;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  flex-direction: column;
-  z-index: 2000;
-}
-
-ui-snack-bar {
-  margin: 0 auto;
-  -webkit-box-flex: 0;
-  flex: 0 0 auto;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  background-color: #323232;
-  color: white;
-  padding: 14px 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  border-radius: 2px;
-  min-width: 288px;
-  max-width: 568px;
-  transition: -webkit-transform 200ms ease-in-out;
-  transition: transform 200ms ease-in-out;
-  transition: transform 200ms ease-in-out, -webkit-transform 200ms ease-in-out;
-}
-
-@media (max-width: 568px) {
-  ui-snack-bar {
-    min-width: auto;
-    max-width: auto;
-    width: 100%;
-    border-radius: 0;
-  }
-}
-
-ui-snack-bar + ui-snack-bar {
-  margin-top: 10px;
-}
-
-ui-snack-bar .text {
-  -webkit-box-flex: 1;
-  flex: 1;
-  font-size: 14px;
-  font-weight: 300;
-}
-
-ui-snack-bar .text:not(:last-child) {
-  padding-right: 48px;
-}
-
-ui-snack-bar button {
-  margin: -8px;
-  padding: 8px;
-  height: auto;
-  font-weight: 500;
-  color: #2196F3;
-}
-
-ui-snack-bar.ng-enter {
-  -webkit-transform: translateY(100%);
-  transform: translateY(100%);
-}
-
-ui-snack-bar.ng-enter-active {
-  -webkit-transform: translateY(0);
-  transform: translateY(0);
-}
-
-ui-snack-bar.ng-leave {
-  -webkit-transform: translateY(0);
-  transform: translateY(0);
-}
-
-ui-snack-bar.ng-leave-active {
-  -webkit-transform: translateY(100%);
-  transform: translateY(100%);
-}
-
-ui-snack-bar + ui-snack-bar {
-  position: absolute;
-  transition-delay: 200ms;
-  visibility: hidden;
 }
 .ui-table {
   overflow: auto;
@@ -5533,176 +5703,6 @@ ui-tree-view .action-wrap button.ng-leave {
 ui-tree-view .action-wrap button.ng-leave-active {
   opacity: 0;
 }
-ui-color-picker {
-  width: 48px;
-  display: block;
-  position: relative;
-}
-
-ui-color-picker .ui-icon {
-  position: absolute;
-  top: 20px;
-}
-
-ui-color-picker .switch-color {
-  display: -webkit-box;
-  display: flex;
-  flex-wrap: wrap;
-  width: 200px;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: white;
-  padding: 3px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  margin: 0 auto;
-  box-sizing: content-box;
-  z-index: 1;
-  margin-top: 1px;
-}
-
-ui-color-picker .switch-color>*:not(.switch-var) {
-  min-width: 20%;
-  height: 40px;
-  transition: 200ms ease-in-out;
-  cursor: pointer;
-}
-
-ui-color-picker .switch-color>.no-color {
-  border: 3px solid #d01716;
-  background-color: white;
-  background-image: linear-gradient(45deg, white 46%, #d01716 48%, #d01716 52%, white 54%);
-}
-
-ui-color-picker .switch-var>*.ui-active {
-  -webkit-transform: scale(0.8);
-  transform: scale(0.8);
-}
-
-ui-color-picker .switch-var {
-  width: 300px;
-  position: absolute;
-  top: -50px;
-  left: 50%;
-  margin-left: -150px;
-  background-color: white;
-  padding: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  transition: 200ms ease-in-out;
-}
-
-ui-color-picker .switch-var:not(.ui-show) {
-  opacity: 0;
-  margin-top: 10px;
-  visibility: hidden;
-}
-
-ui-color-picker .switch-var .arrow {
-  display: block;
-  position: absolute;
-  border-style: solid;
-  border-width: 6px 6px 0;
-  border-color: white transparent transparent;
-  left: 47px;
-  top: 100%;
-  width: 0;
-  transition: 200ms ease-in-out;
-}
-
-ui-color-picker .switch-var>* {
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  transition: 200ms ease-in-out;
-}
-
-ui-color-picker .switch-var>*:not(.ui-show):not(.arrow) {
-  width: 0;
-}
-
-ui-color-picker .txt-color-switch {
-  cursor: pointer;
-}
-
-ui-color-picker .switch-color-preview {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: background-color 100ms ease-in-out;
-  border-radius: 100%;
-  overflow: hidden;
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-}
-
-ui-color-picker .switch-color-preview.no-color {
-  background-color: #d01716;
-}
-
-ui-color-picker .switch-color-preview::before {
-  content: '';
-  display: block;
-  width: 14px;
-  height: 14px;
-  border-radius: 100%;
-  background-color: white;
-  -webkit-transform: scale(0);
-  transform: scale(0);
-  transition: 200ms ease-in-out;
-}
-
-ui-color-picker .switch-color-preview.no-color::before {
-  -webkit-transform: scale(1);
-  transform: scale(1);
-}
-
-ui-color-picker .switch-color-preview::after {
-  content: '';
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  height: 0;
-  width: 0;
-  background-color: #d01716;
-  -webkit-transform: rotate(-45deg);
-  transform: rotate(-45deg);
-  transition: 100ms ease-in-out;
-}
-
-ui-color-picker .switch-color-preview.no-color::after {
-  height: 100%;
-  width: 3px;
-}
-
-ui-color-picker .switch-color-preview.round-rectangle {
-  width: 44px;
-  height: 22px;
-  border-radius: 5px;
-}
-
-ui-color-picker .switch-color-preview.round-rectangle::before {
-  width: 38px;
-  height: 16px;
-  border-radius: 3px;
-}
-
-ui-color-picker .switch-color-preview.round-rectangle.no-color::after {
-  height: 150%;
-}
 ui-autocomplete {
   cursor: text;
   position: relative;
@@ -5730,6 +5730,80 @@ ui-autocomplete .ui-autocomplete-suggestions.ng-leave {
 }
 
 ui-autocomplete .ui-autocomplete-suggestions.ng-leave {
+  opacity: 0;
+  max-height: 0;
+}
+ui-chips {
+  cursor: text;
+}
+
+ui-chip {
+  cursor: default;
+  height: 30px;
+  margin: 4px;
+  background-color: #E0E0E0;
+  border-radius: 20px;
+  display: -webkit-inline-box;
+  display: inline-flex;
+  padding: 0 30px 0 12px;
+  -webkit-box-align: center;
+  align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+  color: rgba(0,0,0,0.8);
+}
+
+ui-chip:focus {
+  background-color: #2196F3;
+  color: white;
+}
+
+ui-chip .remove-chip {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  right: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: rgba(0,0,0,0.8);
+}
+
+ui-chip:focus .remove-chip {
+  color: white;
+}
+
+ui-chips input {
+  -webkit-box-flex: 1;
+  flex: 1;
+  height: 30px;
+  margin: 4px;
+  -ms-grid-row-align: center;
+  align-self: center;
+}
+
+ui-chips .ui-chip-autocomplete {
+  max-height: 20vh;
+  overflow: auto;
+}
+
+ui-chips .ui-chip-autocomplete.ng-enter {
+  opacity: 0;
+  transition: none;
+  max-height: 0;
+}
+
+ui-chips .ui-chip-autocomplete.ng-leave {
+  transition: 300ms ease-in-out;
+}
+
+ui-chips .ui-chip-autocomplete.ng-leave {
   opacity: 0;
   max-height: 0;
 }
@@ -6549,80 +6623,6 @@ ui-input-container.ui-percent >.ui-control~label {
 ui-input-container.ui-percent input {
   padding-right: 14px;
 }
-ui-chips {
-  cursor: text;
-}
-
-ui-chip {
-  cursor: default;
-  height: 30px;
-  margin: 4px;
-  background-color: #E0E0E0;
-  border-radius: 20px;
-  display: -webkit-inline-box;
-  display: inline-flex;
-  padding: 0 30px 0 12px;
-  -webkit-box-align: center;
-  align-items: center;
-  flex-wrap: wrap;
-  position: relative;
-  color: rgba(0,0,0,0.8);
-}
-
-ui-chip:focus {
-  background-color: #2196F3;
-  color: white;
-}
-
-ui-chip .remove-chip {
-  display: -webkit-box;
-  display: flex;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  justify-content: center;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  right: 0;
-  border-radius: 50%;
-  background-color: transparent;
-  color: rgba(0,0,0,0.8);
-}
-
-ui-chip:focus .remove-chip {
-  color: white;
-}
-
-ui-chips input {
-  -webkit-box-flex: 1;
-  flex: 1;
-  height: 30px;
-  margin: 4px;
-  -ms-grid-row-align: center;
-  align-self: center;
-}
-
-ui-chips .ui-chip-autocomplete {
-  max-height: 20vh;
-  overflow: auto;
-}
-
-ui-chips .ui-chip-autocomplete.ng-enter {
-  opacity: 0;
-  transition: none;
-  max-height: 0;
-}
-
-ui-chips .ui-chip-autocomplete.ng-leave {
-  transition: 300ms ease-in-out;
-}
-
-ui-chips .ui-chip-autocomplete.ng-leave {
-  opacity: 0;
-  max-height: 0;
-}
 ui-option-container {
   display: -webkit-box;
   display: flex;
@@ -6876,24 +6876,6 @@ ui-option-container.b-space-8 > ui-option {
 ui-option-container.b-space-16 > ui-option {
   margin-right: 16px;
 }
-.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid,
-.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid,
-.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid {
-  border-color: #F44336;
-}
-
-.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ label,
-.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ label,
-.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ label,
-.ui-error-message {
-  color: #F44336;
-}
-
-.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ .line,
-.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ .line,
-.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ .line {
-  background-color: #F44336;
-}
 ui-switch {
   position: relative;
   width: 36px;
@@ -7008,6 +6990,24 @@ ui-switch input:active + .switch-cover .thumb-container::before {
 
 ui-switch [disabled] + .switch-cover {
   background-color: #bdbdbd;
+}
+.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid,
+.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid,
+.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid {
+  border-color: #F44336;
+}
+
+.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ label,
+.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ label,
+.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ label,
+.ui-error-message {
+  color: #F44336;
+}
+
+.ui-validate:not(.on-dirty):not(.on-submit) .ui-control.ng-invalid ~ .line,
+.ui-validate.on-dirty .ui-control.ng-dirty.ng-invalid ~ .line,
+.ui-validate.on-submit.ng-submitted .ui-control.ng-invalid ~ .line {
+  background-color: #F44336;
 }
 .ui-hamburger-icon {
   position: relative;
